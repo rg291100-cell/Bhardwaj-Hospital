@@ -1,4 +1,4 @@
-            import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -95,7 +96,7 @@ const RescheduleAppointment = () => {
 
     try {
       const token = await AsyncStorage.getItem('access_token');
-      const url = `https://argosmob.uk/bhardwaj-hospital/public/api/appointments/doctor-slots?doctor_id=${doctorId}&date=${date}`;
+      const url = `${baseURL}/appointments/doctor-slots?doctor_id=${doctorId}&date=${date}`;
 
       const response = await axios.get(url, {
         headers: {
@@ -115,7 +116,7 @@ const RescheduleAppointment = () => {
   const getResources = async () => {
     try {
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/get-resources',
+        `${baseURL}/get-resources`,
       );
       console.log('✅ Resources fetched:', response.data?.data);
       setResources(response.data?.data || []);
@@ -214,7 +215,7 @@ const RescheduleAppointment = () => {
       console.log('📤 Payload being sent:', payload);
 
       const response = await axios.post(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/appointments/${appointmentId}`,
+        `${baseURL}/appointments/${appointmentId}`,
         payload,
         {
           headers: {

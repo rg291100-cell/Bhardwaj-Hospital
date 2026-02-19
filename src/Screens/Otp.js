@@ -17,7 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const API_BASE_URL = 'https://argosmob.uk/bhardwaj-hospital/public/api/auth';
+import { baseURL } from '../utils/api';
+const API_BASE_URL = `${baseURL}/auth`;
 
 const Otp = () => {
   const navigation = useNavigation();

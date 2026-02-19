@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const Services = () => {
   const navigation = useNavigation();
@@ -33,7 +34,7 @@ const Services = () => {
       }
 
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/services',
+        `${baseURL}/services`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -49,7 +50,7 @@ const Services = () => {
       Alert.alert('Error', 'Something went wrong');
     }
   };
-    useEffect(() => {
+  useEffect(() => {
     getServices();
   }, []);
 

@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const Emergency = ({ navigation }) => {
   const [emergencyList, setEmergencyList] = useState([]);
@@ -22,7 +23,7 @@ const Emergency = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
 
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/emergency',
+        `${baseURL}/emergency`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     marginRight: 24,
-    fontFamily:"Poppins-SemiBold"
+    fontFamily: "Poppins-SemiBold"
   },
 
   card: {
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#222',
-        fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
 
   },
 
@@ -159,20 +160,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
     marginBottom: 4,
-      fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
   },
 
   meta: {
     fontSize: 13,
     color: '#444',
-      fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
   },
 
   symptoms: {
     fontSize: 13,
     color: '#333',
     marginTop: 6,
-      fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
   },
 
   status: {
@@ -180,24 +181,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#D32F2F',
-      fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
   },
 
   triage: (level) => ({
     fontSize: 12,
-  fontFamily:"Poppins-Medium",
-      color:
+    fontFamily: "Poppins-Medium",
+    color:
       level === 'Red'
         ? '#E53935'
         : level === 'Green'
-        ? '#43A047'
-        : '#1E88E5',
+          ? '#43A047'
+          : '#1E88E5',
   }),
 
   empty: {
     textAlign: 'center',
     marginTop: 40,
     color: '#999',
-      fontFamily:"Poppins-Medium"
+    fontFamily: "Poppins-Medium"
   },
 });

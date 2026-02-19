@@ -22,7 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import * as DocumentPicker from '@react-native-documents/picker';
 
-const baseURL = 'https://argosmob.uk/bhardwaj-hospital/public/api';
+import { baseURL } from '../utils/api';
 
 const Chat = () => {
   const navigation = useNavigation();
@@ -75,12 +75,12 @@ const Chat = () => {
           let messageType = msg.message_type || 'text';
           let fileName = null;
           let mimeType = null;
-          
+
           if (msg.attachments && msg.attachments.length > 0) {
             fileUrl = msg.attachments[0].url;
             fileName = msg.attachments[0].original_name;
             mimeType = msg.attachments[0].mime_type;
-            
+
             // Determine type based on mime type
             if (mimeType?.includes('image')) {
               messageType = 'image';
@@ -101,9 +101,9 @@ const Chat = () => {
             sender: msg.sender_type === 'doctor' ? 'doctor' : 'user',
             time: msg.created_at
               ? new Date(msg.created_at).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
+                hour: '2-digit',
+                minute: '2-digit',
+              })
               : '',
           };
         });
@@ -252,19 +252,19 @@ const Chat = () => {
   //     ]
   //   );
   // };
-const handleOpenPDF = async (fileUrl, fileName) => {
-  try {
-    const supported = await Linking.canOpenURL(fileUrl);
-    if (supported) {
-      await Linking.openURL(fileUrl);
-    } else {
-      Alert.alert('Error', 'Cannot open this PDF file');
+  const handleOpenPDF = async (fileUrl, fileName) => {
+    try {
+      const supported = await Linking.canOpenURL(fileUrl);
+      if (supported) {
+        await Linking.openURL(fileUrl);
+      } else {
+        Alert.alert('Error', 'Cannot open this PDF file');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to open PDF');
+      console.error('Error opening PDF:', error);
     }
-  } catch (error) {
-    Alert.alert('Error', 'Failed to open PDF');
-    console.error('Error opening PDF:', error);
-  }
-};
+  };
   /* ===================== CAMERA / GALLERY / DOCUMENT ===================== */
   const openCamera = async () => {
     const ok = await requestCameraPermission();
@@ -305,7 +305,7 @@ const handleOpenPDF = async (fileUrl, fileName) => {
   /* ===================== RENDER MESSAGE ===================== */
   const renderItem = ({ item }) => {
     const isUser = item.sender === 'user';
-    
+
     return (
       <View
         style={[
@@ -314,13 +314,13 @@ const handleOpenPDF = async (fileUrl, fileName) => {
         ]}
       >
         {item.type === 'image' && item.file ? (
-          <Image 
-            source={{ uri: item.file }} 
+          <Image
+            source={{ uri: item.file }}
             style={styles.imageMsg}
             resizeMode="cover"
           />
         ) : item.type === 'pdf' && item.file ? (
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => handleOpenPDF(item.file, item.fileName)}
             style={styles.pdfContainer}
           >
@@ -346,7 +346,7 @@ const handleOpenPDF = async (fileUrl, fileName) => {
             </View>
           </TouchableOpacity>
         ) : item.type === 'file' && item.file ? (
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => Linking.openURL(item.file)}
             style={styles.fileContainer}
           >
@@ -393,15 +393,15 @@ const handleOpenPDF = async (fileUrl, fileName) => {
               source={
                 doctorImage
                   ? {
-                      uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctorImage}`,
-                    }
+                    uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctorImage}`,
+                  }
                   : require('../assets/Images/Doctor.png')
               }
               style={styles.avatar}
             />
             <Text style={styles.doctorName}>{doctorName}</Text>
           </View>
-          <View/>
+          <View />
         </View>
 
         <FlatList

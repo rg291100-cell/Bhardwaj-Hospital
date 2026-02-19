@@ -21,6 +21,7 @@ import {
 } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { baseURL } from '../utils/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
@@ -41,7 +42,7 @@ const Profile = () => {
       console.log('token', token);
 
       const res = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/profile/get',
+        `${baseURL}/profile/get`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -74,7 +75,7 @@ const Profile = () => {
       });
 
       const res = await axios.post(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/profile/update-profile-image',
+        `${baseURL}/profile/update-profile-image`,
         formData,
         {
           headers: {
@@ -143,34 +144,34 @@ const Profile = () => {
   //   navigation.replace('Login');
   // };
 
-const handleLogout = async () => {
-  Alert.alert(
-    'Logout',
-    'Are you sure you want to logout?',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await AsyncStorage.removeItem('access_token');
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('access_token');
 
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-              }),
-            );
-          } catch (error) {
-            Alert.alert('Error', 'Failed to logout');
-          }
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                }),
+              );
+            } catch (error) {
+              Alert.alert('Error', 'Failed to logout');
+            }
+          },
         },
-      },
-    ],
-    { cancelable: true },
-  );
-};
+      ],
+      { cancelable: true },
+    );
+  };
 
 
   console.log(
@@ -226,10 +227,10 @@ const handleLogout = async () => {
                   localImage
                     ? { uri: localImage.uri }
                     : user?.profile_picture
-                    ? {
+                      ? {
                         uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/profiles/${user.profile_picture}`,
                       }
-                    : require('../assets/Images/Splash.png')
+                      : require('../assets/Images/Splash.png')
                 }
                 style={styles.profileImage}
               />
@@ -277,7 +278,7 @@ const handleLogout = async () => {
             <Icon name="arrow-right" size={22} color="#E66A2C" />
           </TouchableOpacity>
           <TouchableOpacity
- 
+
             style={styles.settingRow}
           >
             <Text style={[styles.settingText]}>Rate Our App</Text>
@@ -290,7 +291,7 @@ const handleLogout = async () => {
                 paddingVertical: 12,
                 textAlign: 'center',
                 fontFamily: 'Poppins-SemiBold',
-                marginTop:10
+                marginTop: 10
               },
             ]}
           >
@@ -330,17 +331,17 @@ const handleLogout = async () => {
               />
             </TouchableOpacity>
 
-                        <TouchableOpacity
-                     onPress={() =>
-              Linking.openURL('https://prac.to/IPRCTO/7JZjUBNu').catch(err =>
-                console.error('Failed to open URL:', err),
-              )
-            }
+            <TouchableOpacity
+              onPress={() =>
+                Linking.openURL('https://prac.to/IPRCTO/7JZjUBNu').catch(err =>
+                  console.error('Failed to open URL:', err),
+                )
+              }
               activeOpacity={0.8}
             >
               <Image
                 source={require('../assets/practo_logo.png')}
-                style={{ width: 120, height: 120 ,resizeMode:'contain' }}
+                style={{ width: 120, height: 120, resizeMode: 'contain' }}
               />
             </TouchableOpacity>
           </View>

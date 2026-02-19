@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { baseURL } from '../utils/api';
 
 // 🔹 Single Report Item
 const ReportItem = ({ item, onPress }) => {
@@ -80,25 +81,25 @@ const PrescriptionItem = ({ item, onPress }) => {
 
 
 
-const ReportsScreen = ({ navigation,route }) => {
-const { appointmentId } = route.params || {};
-console.log("Appintmet Id",appointmentId);
+const ReportsScreen = ({ navigation, route }) => {
+  const { appointmentId } = route.params || {};
+  console.log("Appintmet Id", appointmentId);
 
   // const [activeTab, setActiveTab] = useState('reports'); // 'reports' or 'prescriptions'
   const [activeTab, setActiveTab] = useState(
-  appointmentId ? 'prescriptions' : 'reports'
-);
+    appointmentId ? 'prescriptions' : 'reports'
+  );
   const [reports, setReports] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
-   const getPrescriptions = async () => {
+  const getPrescriptions = async () => {
     try {
       const token = await AsyncStorage.getItem('access_token');
 
       const response = await axios.get(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/prescriptions?appointment_id=${appointmentId}`,
+        `${baseURL}/prescriptions?appointment_id=${appointmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -106,9 +107,9 @@ console.log("Appintmet Id",appointmentId);
           },
         }
       );
-console.log("prection",response.data);
+      console.log("prection", response.data);
 
-setPrescriptions(response.data?.prescriptions || []);
+      setPrescriptions(response.data?.prescriptions || []);
     } catch (error) {
       console.log(
         'PRESCRIPTION API ERROR:',
@@ -127,7 +128,7 @@ setPrescriptions(response.data?.prescriptions || []);
     try {
       const token = await AsyncStorage.getItem('access_token');
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/medical-reports',
+        `${baseURL}/medical-reports`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -136,7 +137,7 @@ setPrescriptions(response.data?.prescriptions || []);
         },
       );
       // console.log("hghgfhfhgfhg",response.data);
-      
+
       setReports(response.data?.data || []);
     } catch (error) {
       console.log(

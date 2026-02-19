@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { baseURL } from '../utils/api';
 
 const Doctors = () => {
   const [search, setSearch] = useState('');
@@ -28,7 +29,7 @@ const Doctors = () => {
       setLoading(true);
       const token = await AsyncStorage.getItem('access_token');
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/health-tips',
+        `${baseURL}/health-tips`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -37,7 +38,7 @@ const Doctors = () => {
         }
       );
       console.log("ajkdfhajkdfhjad", response.data);
-      
+
       setExpertTips(response?.data?.data || []);
     } catch (error) {
       console.log('Expert Tips API Error:', error?.response?.data || error.message);
@@ -56,7 +57,7 @@ const Doctors = () => {
       setLoading(true);
       const token = await AsyncStorage.getItem('access_token');
       const response = await axios.get(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/health-tips-search?q=${query}`,
+        `${baseURL}/health-tips-search?q=${query}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,20 +95,20 @@ const Doctors = () => {
   const renderItem = ({ item }) => {
     // ✅ Fix: Construct full image URL
     const thumbnailUrl = `https://argosmob.uk/bhardwaj-hospital/public/storage/${item.thumbnail_image}`;
-    
+
     return (
-      <TouchableOpacity 
-        style={styles.card} 
+      <TouchableOpacity
+        style={styles.card}
         onPress={() => openYoutube(item.link)} // ✅ Fix: Use 'link' instead of 'video_link'
       >
-        <Image 
-          source={{ uri: thumbnailUrl }} 
+        <Image
+          source={{ uri: thumbnailUrl }}
           style={styles.thumbnail}
           resizeMode="cover" // ✅ Add resize mode
         />
-        <Image 
-          source={require('../assets/youtube.png')} 
-          style={styles.playIcon} 
+        <Image
+          source={require('../assets/youtube.png')}
+          style={styles.playIcon}
         />
         <Text style={styles.title}>{item.title}</Text>
         {item.description && (
@@ -161,33 +162,33 @@ export default Doctors;
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   content: { paddingHorizontal: 16, paddingTop: 10, flex: 1 },
-  header: { 
-    fontSize: 20, 
-    color: '#111', 
-    textAlign: 'center', 
-    marginVertical: 16, 
-    fontFamily: 'Poppins-SemiBold' 
+  header: {
+    fontSize: 20,
+    color: '#111',
+    textAlign: 'center',
+    marginVertical: 16,
+    fontFamily: 'Poppins-SemiBold'
   },
-  searchBox: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#f2f4f7', 
-    borderRadius: 14, 
-    paddingHorizontal: 14, 
-    paddingVertical: 12, 
-    marginBottom: 20 
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f4f7',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 20
   },
   searchIcon: { width: 20, height: 20, tintColor: '#8e8e93' },
-  searchInput: { 
-    flex: 1, 
-    marginLeft: 10, 
-    fontSize: 14, 
-    color: '#000', 
-    fontFamily: 'Poppins-Regular' 
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#000',
+    fontFamily: 'Poppins-Regular'
   },
-  card: { 
-    backgroundColor: '#fff', 
-    borderRadius: 16, 
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
     paddingBottom: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -195,27 +196,27 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  thumbnail: { 
-    width: '100%', 
-    height: 190, 
+  thumbnail: {
+    width: '100%',
+    height: 190,
     borderRadius: 16,
     backgroundColor: '#f0f0f0' // ✅ Placeholder color while loading
   },
-  playIcon: { 
-    position: 'absolute', 
-    top: '35%', 
-    alignSelf: 'center', 
-    width: 58, 
-    height: 58 
+  playIcon: {
+    position: 'absolute',
+    top: '35%',
+    alignSelf: 'center',
+    width: 58,
+    height: 58
   },
-  title: { 
-    marginTop: 12, 
-    fontSize: 15, 
-    color: '#111', 
-    fontFamily: 'Poppins-Medium', 
-    textAlign: 'center', 
-    paddingHorizontal: 10, 
-    lineHeight: 22 
+  title: {
+    marginTop: 12,
+    fontSize: 15,
+    color: '#111',
+    fontFamily: 'Poppins-Medium',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+    lineHeight: 22
   },
   description: {
     marginTop: 4,
@@ -227,11 +228,11 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   separator: { height: 16 },
-  emptyText: { 
-    marginTop: 60, 
-    textAlign: 'center', 
-    color: '#8e8e93', 
-    fontSize: 14, 
-    fontFamily: 'Poppins-Regular' 
+  emptyText: {
+    marginTop: 60,
+    textAlign: 'center',
+    color: '#8e8e93',
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular'
   },
 });

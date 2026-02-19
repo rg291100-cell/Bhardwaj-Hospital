@@ -17,6 +17,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../utils/api';
 
+console.log('DEBUG: Appointment.js loaded. BASE_URL =', BASE_URL);
+
 const Appointment = () => {
   const navigation = useNavigation();
 
@@ -103,9 +105,23 @@ const Appointment = () => {
       }
 
       setLoading(false);
+      setLoading(false);
     } catch (err) {
       console.error('Failed to load appointments:', err);
-      setError('Failed to load appointments');
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log('Error Data:', err.response.data);
+        console.log('Error Status:', err.response.status);
+        console.log('Error Headers:', err.response.headers);
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.log('Error Request:', err.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error Message:', err.message);
+      }
+      setError('Failed to load appointments: ' + (err.message || 'Unknown error'));
       setLoading(false);
     }
   };
@@ -162,37 +178,37 @@ const Appointment = () => {
         return status;
     }
   };
-// const isAppointmentInPast = appointment => {
-//   if (!appointment.appointment_date || !appointment.start_time) return false;
+  // const isAppointmentInPast = appointment => {
+  //   if (!appointment.appointment_date || !appointment.start_time) return false;
 
-//   const appointmentDateTime = new Date(
-//     `${appointment.appointment_date} ${appointment.start_time}`
-//   );
+  //   const appointmentDateTime = new Date(
+  //     `${appointment.appointment_date} ${appointment.start_time}`
+  //   );
 
-//   return new Date() > appointmentDateTime;
-// };
-const isJoinWindowClosed = appointment => {
-  if (!appointment.appointment_date || !appointment.start_time) return true;
+  //   return new Date() > appointmentDateTime;
+  // };
+  const isJoinWindowClosed = appointment => {
+    if (!appointment.appointment_date || !appointment.start_time) return true;
 
-  const startDateTime = new Date(
-    `${appointment.appointment_date} ${appointment.start_time}`
-  );
+    const startDateTime = new Date(
+      `${appointment.appointment_date} ${appointment.start_time}`
+    );
 
-  const now = new Date();
+    const now = new Date();
 
-  const ALLOW_BEFORE_MINUTES = 5;
-  const ALLOW_AFTER_MINUTES = 15; // grace period after start
+    const ALLOW_BEFORE_MINUTES = 5;
+    const ALLOW_AFTER_MINUTES = 15; // grace period after start
 
-  const joinStartTime = new Date(
-    startDateTime.getTime() - ALLOW_BEFORE_MINUTES * 60000
-  );
+    const joinStartTime = new Date(
+      startDateTime.getTime() - ALLOW_BEFORE_MINUTES * 60000
+    );
 
-  const joinEndTime = new Date(
-    startDateTime.getTime() + ALLOW_AFTER_MINUTES * 60000
-  );
+    const joinEndTime = new Date(
+      startDateTime.getTime() + ALLOW_AFTER_MINUTES * 60000
+    );
 
-  return now < joinStartTime || now > joinEndTime;
-};
+    return now < joinStartTime || now > joinEndTime;
+  };
 
 
   /* ===================== HANDLE JOIN BUTTON PRESS ===================== */
@@ -321,9 +337,8 @@ const isJoinWindowClosed = appointment => {
 
   /* ===================== APPOINTMENT CARD ===================== */
   const renderAppointmentCard = (appointment, index) => {
-    const doctorName = `${appointment.doctor?.first_name || ''} ${
-      appointment.doctor?.last_name || ''
-    }`.trim();
+    const doctorName = `${appointment.doctor?.first_name || ''} ${appointment.doctor?.last_name || ''
+      }`.trim();
 
     const joinEnabled = isJoinEnabled(appointment);
 
@@ -341,8 +356,8 @@ const isJoinWindowClosed = appointment => {
             source={
               appointment.doctor?.profile_image
                 ? {
-                    uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${appointment.doctor.profile_image}`,
-                  }
+                  uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${appointment.doctor.profile_image}`,
+                }
                 : require('../assets/Images/Doctor.png')
             }
             style={styles.doctorImage}
@@ -364,32 +379,32 @@ const isJoinWindowClosed = appointment => {
           {/* ===================== JOIN BUTTON ===================== */}
           <View>
             {appointment.status === 'scheduled' &&
-  appointment.type === 'video' &&
-  !isJoinWindowClosed(appointment) && (
-    <TouchableOpacity
-      disabled={!joinEnabled}
-      style={[
-        styles.joinButton,
-        !joinEnabled && styles.joinButtonDisabled,
-      ]}
-      onPress={() => handleJoinPress(appointment.id)}
-    >
-      <Text style={styles.joinText}>
-        {joinEnabled ? 'Join' : 'Not Started'}
-      </Text>
-    </TouchableOpacity>
-)}
+              appointment.type === 'video' &&
+              !isJoinWindowClosed(appointment) && (
+                <TouchableOpacity
+                  disabled={!joinEnabled}
+                  style={[
+                    styles.joinButton,
+                    !joinEnabled && styles.joinButtonDisabled,
+                  ]}
+                  onPress={() => handleJoinPress(appointment.id)}
+                >
+                  <Text style={styles.joinText}>
+                    {joinEnabled ? 'Join' : 'Not Started'}
+                  </Text>
+                </TouchableOpacity>
+              )}
 
             <TouchableOpacity
-  onPress={() => {
-    console.log('Prescription appointment ID:', appointment.id);
-    navigation.navigate('ReportsScreen', { appointmentId: appointment.id });
-  }}              style={[
+              onPress={() => {
+                console.log('Prescription appointment ID:', appointment.id);
+                navigation.navigate('ReportsScreen', { appointmentId: appointment.id });
+              }} style={[
                 styles.joinButton,
                 {
                   marginTop:
                     appointment.status === 'scheduled' &&
-                    appointment.type === 'video'
+                      appointment.type === 'video'
                       ? 10
                       : 0,
                 },

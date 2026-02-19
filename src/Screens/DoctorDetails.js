@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const DoctorDetails = () => {
   const navigation = useNavigation();
@@ -23,18 +24,18 @@ const DoctorDetails = () => {
   const [loading, setLoading] = useState(true);
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const [selectedDay, setSelectedDay] = useState(null);
-const [consultationFee, setConsultationFee] = useState(null);
+  const [consultationFee, setConsultationFee] = useState(null);
 
   const getDoctorById = async () => {
     console.log('dfnsdfnksdjfk');
 
     try {
       const response = await axios.get(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/doctors/${doctorId}`,
+        `${baseURL}/doctors/${doctorId}`,
       );
       setDoctor(response.data?.data);
       console.log('Doctor ID 123', response.data?.data);
-setConsultationFee(response.data?.data?.consultation_fee);
+      setConsultationFee(response.data?.data?.consultation_fee);
 
 
       console.log();
@@ -76,8 +77,8 @@ setConsultationFee(response.data?.data?.consultation_fee);
             source={
               doctor?.profile_image
                 ? {
-                    uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctor.profile_image}`,
-                  }
+                  uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctor.profile_image}`,
+                }
                 : require('../assets/Images/Doctor.png')
             }
             style={styles.profileImage}
@@ -141,7 +142,7 @@ setConsultationFee(response.data?.data?.consultation_fee);
           />
         </View>
 
-   
+
 
         {/* <View style={styles.reviewCard}>
             <Image
@@ -196,12 +197,12 @@ setConsultationFee(response.data?.data?.consultation_fee);
         {/* Book Button */}
         <View style={{ marginTop: 60 }}>
           <TouchableOpacity
-onPress={() =>
-  navigation.navigate('BookAppointment', {
-    doctorId: doctorId,
-    consultationFee: consultationFee,
-  })
-}            style={styles.bookButton}
+            onPress={() =>
+              navigation.navigate('BookAppointment', {
+                doctorId: doctorId,
+                consultationFee: consultationFee,
+              })
+            } style={styles.bookButton}
           >
             <Text style={styles.bookButtonText}>Book Appointment</Text>
           </TouchableOpacity>
@@ -249,19 +250,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#000',
     marginTop: 10,
-        fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-SemiBold',
 
   },
   specialization: {
     fontSize: 15,
     color: '#777',
-        fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-Medium',
 
   },
   experience: {
     fontSize: 14,
     color: '#999',
-        fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   section: {
@@ -273,20 +274,20 @@ const styles = StyleSheet.create({
     // fontWeight: '700',
     color: '#000',
     marginBottom: 8,
-            fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-Medium',
 
   },
   aboutText: {
     color: '#555',
     lineHeight: 20,
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   infoText: {
     color: '#444',
     fontSize: 12,
     fontWeight: '500',
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   slotRow: {
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
   slotText: {
     color: '#fff',
     // fontWeight: '600',
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   ratingRow: {
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     // fontWeight: '700',
     fontSize: 16,
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   dayButton: {
@@ -420,12 +421,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#000',
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
   dayTextSelected: {
     color: '#fff',
-            fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Regular',
 
   },
 });

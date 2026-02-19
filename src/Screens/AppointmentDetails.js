@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const baseURL = 'https://argosmob.uk/bhardwaj-hospital/public/api';
+import { baseURL } from '../utils/api';
 
 const AppointmentDetails = () => {
   const navigation = useNavigation();
@@ -49,7 +49,7 @@ const AppointmentDetails = () => {
   };
   const formatAppointmentDate = isoDate => {
     if (!isoDate) return '';
-    const dateObj = new Date(isoDate); 
+    const dateObj = new Date(isoDate);
     return dateObj.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
@@ -79,7 +79,7 @@ const AppointmentDetails = () => {
       }
 
       const response = await axios.delete(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/appointments/${id}`,
+        `${baseURL}/appointments/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -146,8 +146,8 @@ const AppointmentDetails = () => {
               source={
                 appointment?.doctor?.profile_image
                   ? {
-                      uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${appointment.doctor.profile_image}`,
-                    }
+                    uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${appointment.doctor.profile_image}`,
+                  }
                   : require('../assets/Images/Doctor.png')
               }
               style={styles.doctorImage}
@@ -280,24 +280,24 @@ const AppointmentDetails = () => {
             }
           > */}
           <TouchableOpacity
-  style={styles.rescheduleButton}
-  onPress={() => {
+            style={styles.rescheduleButton}
+            onPress={() => {
 
-    navigation.navigate('RescheduleAppointment', {
-      doctorId: appointment.doctor.id,
-      appointmentId: appointment.id,
-      appointmentDate: formatDateForCalendar(
-        appointment.appointment_date,
-      ),
-      appointmentStartTime: appointment.start_time,
-      appointmentEndTime: appointment.end_time,
-      resourceName: appointment.resource?.name || '',
-      notes: appointment.notes || '',
-        doctorImage: appointment.doctor?.profile_image || ''  , // ONLY image name/path
+              navigation.navigate('RescheduleAppointment', {
+                doctorId: appointment.doctor.id,
+                appointmentId: appointment.id,
+                appointmentDate: formatDateForCalendar(
+                  appointment.appointment_date,
+                ),
+                appointmentStartTime: appointment.start_time,
+                appointmentEndTime: appointment.end_time,
+                resourceName: appointment.resource?.name || '',
+                notes: appointment.notes || '',
+                doctorImage: appointment.doctor?.profile_image || '', // ONLY image name/path
 
-    });
-  }}
->
+              });
+            }}
+          >
 
             <Text style={styles.rescheduleText}>Reschedule</Text>
           </TouchableOpacity>
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   bioText: {
     fontSize: 14,
     color: '#555',
-    flexShrink: 1, 
+    flexShrink: 1,
     fontFamily: 'Poppins-Medium',
   },
 });

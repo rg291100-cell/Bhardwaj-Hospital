@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const Events = () => {
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const Events = () => {
       }
 
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/events',
+        `${baseURL}/events`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,12 +58,12 @@ const Events = () => {
   const renderEvent = ({ item }) => {
     return (
       <TouchableOpacity style={styles.card} activeOpacity={0.8}
-            onPress={() => navigation.navigate('EventsDetail', { eventId: item.id })}
+        onPress={() => navigation.navigate('EventsDetail', { eventId: item.id })}
 
       >
         {/* Event Image */}
         <Image
-  source={{ uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/events/${item.image}` }}
+          source={{ uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/events/${item.image}` }}
           style={styles.eventImage}
         />
 
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     marginRight: 24,
-     fontFamily: 'Poppins-SemiBold'
+    fontFamily: 'Poppins-SemiBold'
   },
 
   card: {
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
   eventTitle: {
     fontSize: 16,
     color: '#000',
-     fontFamily: 'Poppins-Medium'
+    fontFamily: 'Poppins-Medium'
   },
 
   eventType: {
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
     color: '#ff5722',
     marginTop: 2,
     fontWeight: '600',
-         fontFamily: 'Poppins-Regular'
+    fontFamily: 'Poppins-Regular'
 
   },
 
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
     marginTop: 4,
-             fontFamily: 'Poppins-Regular'
+    fontFamily: 'Poppins-Regular'
 
   },
 
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginLeft: 6,
-             fontFamily: 'Poppins-Regular'
+    fontFamily: 'Poppins-Regular'
 
   },
 
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 40,
     color: '#999',
-             fontFamily: 'Poppins-Regular'
+    fontFamily: 'Poppins-Regular'
 
   },
 });

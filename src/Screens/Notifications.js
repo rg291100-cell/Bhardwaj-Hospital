@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { baseURL } from '../utils/api';
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -35,7 +36,7 @@ const Notifications = () => {
       }
 
       const response = await axios.get(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/notifications',
+        `${baseURL}/notifications`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,7 +44,7 @@ const Notifications = () => {
           },
         },
       );
-console.log("Notifications",response?.data?.data);
+      console.log("Notifications", response?.data?.data);
 
       setNotifications(response?.data?.data || []);
     } catch (error) {

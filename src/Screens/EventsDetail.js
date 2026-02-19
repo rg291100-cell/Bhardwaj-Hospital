@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const EventsDetail = () => {
   const route = useRoute();
@@ -35,7 +36,7 @@ const EventsDetail = () => {
       }
 
       const response = await axios.get(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/events/${eventId}`,
+        `${baseURL}/events/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -148,7 +149,7 @@ const EventsDetail = () => {
             uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/events/${event.image}`,
           }}
           style={styles.eventImage}
-          // defaultSource={require('../assets/placeholder.png')}
+        // defaultSource={require('../assets/placeholder.png')}
         />
 
         {/* Title */}
@@ -217,7 +218,7 @@ const EventsDetail = () => {
         {/* Social Media Icons */}
         <View style={styles.socialContainer}>
           {/* Facebook */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.socialButton}
             onPress={() => openFacebook(event.facebook_url)}
           >

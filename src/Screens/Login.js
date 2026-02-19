@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const Login = () => {
   const navigation = useNavigation();
@@ -44,7 +45,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://argosmob.uk/bhardwaj-hospital/public/api/auth/request-otp',
+        `${baseURL}/auth/request-otp`,
         { email: email },
       );
 
@@ -52,12 +53,12 @@ const Login = () => {
       // if (response.data.status == 'true') {
       //   Alert.alert('Success', `OTP sent to: ${email}`);
 
-        navigation.navigate('Otp', {
-          email: email,
-        });
+      navigation.navigate('Otp', {
+        email: email,
+      });
       // } else {
       //   console.log("Error",response.data.message);
-        
+
       //   setError(response.data.message || 'Something went wrong');
       // }
     } catch (err) {

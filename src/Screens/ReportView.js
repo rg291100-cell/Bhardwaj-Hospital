@@ -18,6 +18,7 @@ import axios from 'axios';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNPrint from 'react-native-print';
 import Share from 'react-native-share';
+import { baseURL } from '../utils/api';
 
 const ReportView = ({ route }) => {
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const ReportView = ({ route }) => {
     try {
       const token = await AsyncStorage.getItem('access_token');
       const res = await axios.get(
-        `https://argosmob.uk/bhardwaj-hospital/public/api/medical-reports/${reportId}`,
+        `${baseURL}/medical-reports/${reportId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,36 +135,30 @@ const ReportView = ({ route }) => {
 
   <div class="section">
     <div class="section-title">Patient Details</div>
-    <div class="field"><strong>Name:</strong> <span class="value">${
-      report.patient?.name || 'N/A'
-    }</span></div>
-    <div class="field"><strong>Gender:</strong> <span class="value">${
-      report.patient?.gender || 'N/A'
-    }</span></div>
-    <div class="field"><strong>Phone:</strong> <span class="value">${
-      report.patient?.phone || 'N/A'
-    }</span></div>
+    <div class="field"><strong>Name:</strong> <span class="value">${report.patient?.name || 'N/A'
+      }</span></div>
+    <div class="field"><strong>Gender:</strong> <span class="value">${report.patient?.gender || 'N/A'
+      }</span></div>
+    <div class="field"><strong>Phone:</strong> <span class="value">${report.patient?.phone || 'N/A'
+      }</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">Doctor</div>
-    <div class="field"><strong>Name:</strong> <span class="value">${
-      report.doctor?.name || 'N/A'
-    }</span></div>
+    <div class="field"><strong>Name:</strong> <span class="value">${report.doctor?.name || 'N/A'
+      }</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">Diagnosis</div>
-    <div class="field"><span class="value">${
-      report.diagnosis || 'N/A'
-    }</span></div>
+    <div class="field"><span class="value">${report.diagnosis || 'N/A'
+      }</span></div>
   </div>
 
   <div class="section">
     <div class="section-title">Treatment Plan</div>
-    <div class="field"><span class="value">${
-      report.treatment_plan || 'N/A'
-    }</span></div>
+    <div class="field"><span class="value">${report.treatment_plan || 'N/A'
+      }</span></div>
   </div>
 
   <div class="footer">

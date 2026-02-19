@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { baseURL } from '../utils/api';
 
 const Form = ({ route }) => {
   const navigation = useNavigation();
@@ -315,7 +316,7 @@ const Form = ({ route }) => {
 
       if (!isNewImage) {
         response = await axios.post(
-          'https://argosmob.uk/bhardwaj-hospital/public/api/profile/update',
+          `${baseURL}/profile/update`,
           payload,
           {
             headers: {
@@ -346,7 +347,7 @@ const Form = ({ route }) => {
         console.log('📤 Sending FormData with image...');
 
         response = await axios.post(
-          'https://argosmob.uk/bhardwaj-hospital/public/api/profile/update',
+          `${baseURL}/profile/update`,
           formData,
           {
             headers: {
