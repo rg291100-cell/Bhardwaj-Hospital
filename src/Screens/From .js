@@ -59,9 +59,7 @@ const Form = () => {
       !form.password ||
       !form.gender ||
       !form.age ||
-      !form.address ||
-      !form.emergencyContact ||
-      !form.alternateContact
+      !form.address
     ) {
       Alert.alert('Missing Information', 'Please fill all required fields.');
       return;
@@ -77,16 +75,6 @@ const Form = () => {
     // Validate phone number length
     if (form.phone.length !== 10) {
       Alert.alert('Invalid Number', 'Phone number must be 10 digits.');
-      return;
-    }
-
-    if (form.emergencyContact.length !== 10) {
-      Alert.alert('Invalid Number', 'Emergency contact must be 10 digits.');
-      return;
-    }
-
-    if (form.alternateContact.length !== 10) {
-      Alert.alert('Invalid Number', 'Alternate contact must be 10 digits.');
       return;
     }
 
@@ -109,9 +97,20 @@ const Form = () => {
       formData.append('gender', form.gender);
       formData.append('age', form.age);
       formData.append('address', form.address.trim());
-      formData.append('emergency_contact_number', form.emergencyContact);
-      formData.append('alternate_contact_number', form.alternateContact);
-      formData.append('basic_medical_history', form.history.trim() || 'None');
+
+      if (form.emergencyContact.trim()) {
+        formData.append('emergency_contact_number', form.emergencyContact.trim());
+      }
+
+      if (form.alternateContact.trim()) {
+        formData.append('alternate_contact_number', form.alternateContact.trim());
+      }
+
+      if (form.history.trim()) {
+        formData.append('basic_medical_history', form.history.trim());
+      } else {
+        formData.append('basic_medical_history', 'None');
+      }
 
       if (photo) {
         formData.append('profile_image', {
@@ -129,8 +128,8 @@ const Form = () => {
       console.log('Gender:', form.gender);
       console.log('Age:', form.age);
       console.log('Address:', form.address.trim());
-      console.log('Emergency Contact:', form.emergencyContact);
-      console.log('Alternate Contact:', form.alternateContact);
+      console.log('Emergency Contact:', form.emergencyContact || '(empty)');
+      console.log('Alternate Contact:', form.alternateContact || '(empty)');
       console.log('Medical History:', form.history.trim() || 'None');
       console.log('Photo:', photo ? 'Attached' : 'Not attached');
 
@@ -140,6 +139,7 @@ const Form = () => {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
           },
           timeout: 30000,
         },
@@ -167,27 +167,23 @@ const Form = () => {
       console.log('Error:', error);
       console.log('Error Message:', error?.message);
       console.log('Response Status:', error?.response?.status);
-      console.log('Response Data:', error?.response?.data);
-      console.log('Response Headers:', error?.response?.headers);
+      console.log('Response Data:', JSON.stringify(error?.response?.data, null, 2));
 
       // Handle 422 validation errors specifically
       if (error?.response?.status === 422) {
         const errorData = error?.response?.data;
 
-        // Laravel validation errors are usually in 'errors' or 'message' field
         if (errorData?.errors) {
-          const errorMessages = Object.values(errorData.errors)
-            .flat()
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
             .join('\n');
           Alert.alert('Validation Error', errorMessages);
         } else if (errorData?.message) {
           Alert.alert('Validation Error', errorData.message);
-        } else if (errorData?.error) {
-          Alert.alert('Validation Error', errorData.error);
         } else {
           Alert.alert(
             'Validation Error',
-            'Please check all fields and try again.\n\n' + JSON.stringify(errorData),
+            'Please check all fields.\n' + JSON.stringify(errorData),
           );
         }
       } else {
@@ -305,7 +301,7 @@ const Form = () => {
         />
 
         {/* Emergency Contact */}
-        <Text style={styles.label}>Emergency Contact Number</Text>
+        <Text style={styles.label}>Emergency Contact Number (Optional)</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter phone number"
@@ -316,7 +312,7 @@ const Form = () => {
         />
 
         {/* Alternate Contact */}
-        <Text style={styles.label}>Alternate Contact Number</Text>
+        <Text style={styles.label}>Alternate Contact Number (Optional)</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter phone number"
@@ -327,7 +323,7 @@ const Form = () => {
         />
 
         {/* History */}
-        <Text style={styles.label}>Basic Medical History</Text>
+        <Text style={styles.label}>Basic Medical History (Optional)</Text>
         <TextInput
           style={[styles.input, { height: 90 }]}
           multiline
