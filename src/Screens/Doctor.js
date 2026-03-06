@@ -94,7 +94,8 @@ const Doctors = () => {
   // 🎬 Render Item
   const renderItem = ({ item }) => {
     // ✅ Fix: Construct full image URL
-    const thumbnailUrl = `https://argosmob.uk/bhardwaj-hospital/public/storage/${item.thumbnail_image}`;
+    const thumbnailUrl = `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${item.thumbnail_image}`;
+
 
     return (
       <TouchableOpacity

@@ -201,6 +201,8 @@ const DoctorDetails = () => {
               navigation.navigate('BookAppointment', {
                 doctorId: doctorId,
                 consultationFee: consultationFee,
+                newPatientFee: doctor?.new_patient_fee,
+                oldPatientFee: doctor?.old_patient_fee,
               })
             } style={styles.bookButton}
           >

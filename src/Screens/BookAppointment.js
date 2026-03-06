@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Modal,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,6 +33,10 @@ const BookAppointment = () => {
   const [appointmentType, setAppointmentType] = useState('person');
   const [symptoms, setSymptoms] = useState('');
   const [loading, setLoading] = useState(false);
+  const { newPatientFee, oldPatientFee } = route.params;
+  const [patientType, setPatientType] = useState(null); // 'new' or 'old'
+  const [showFeeModal, setShowFeeModal] = useState(false);
+  const [selectedFee, setSelectedFee] = useState(consultationFee);
 
   // Time slot states
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -180,6 +186,11 @@ const BookAppointment = () => {
         return;
       }
 
+      if (!patientType) {
+        setShowFeeModal(true);
+        return;
+      }
+
       const token = await AsyncStorage.getItem('access_token');
       if (!token) {
         alert('Token not found');
@@ -223,7 +234,7 @@ const BookAppointment = () => {
 
       const data = await RazorpayCheckout.open({
         ...options,
-        amount: consultationFee * 100,
+        amount: selectedFee * 100,
         key: 'rzp_test_oZWpPCp1BkgtEg' // Reverting key to what was in file
       });
       console.log('✅ Payment Success id:', data?.razorpay_payment_id);
@@ -280,6 +291,8 @@ const BookAppointment = () => {
         notes: symptoms,
         // resource_name: selectedResource,
         type: appointmentType,
+        patient_type: patientType,
+        fee: selectedFee,
       };
       console.log('📤 Payload being sent:', payload); // ✅ ADDED: Debug log
       const response = await axios.post(
@@ -498,10 +511,70 @@ const BookAppointment = () => {
               onPress={handlePayment}
             >
               <Text style={styles.confirmText}>
-                Pay ₹{consultationFee} & Book
+                {patientType ? `Pay ₹${selectedFee} & Book` : 'Select Patient Type & Book'}
               </Text>
             </TouchableOpacity>
           )}
+
+          {/* Patient Type Selection Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showFeeModal}
+            onRequestClose={() => setShowFeeModal(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Are you a New or Old Patient?</Text>
+                <Text style={styles.modalSubtitle}>Please select to continue booking</Text>
+
+                <TouchableOpacity
+                  style={[styles.feeOption, patientType === 'new' && styles.feeOptionSelected]}
+                  onPress={() => {
+                    setPatientType('new');
+                    setSelectedFee(newPatientFee || consultationFee);
+                    setShowFeeModal(false);
+                  }}
+                >
+                  <View>
+                    <Text style={styles.feeOptionTitle}>New Patient</Text>
+                    <Text style={styles.feeAmount}>₹{newPatientFee || consultationFee}</Text>
+                  </View>
+                  <Icon
+                    name={patientType === 'new' ? "record-circle" : "circle-outline"}
+                    size={24}
+                    color="#E66A2C"
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.feeOption, patientType === 'old' && styles.feeOptionSelected]}
+                  onPress={() => {
+                    setPatientType('old');
+                    setSelectedFee(oldPatientFee || consultationFee);
+                    setShowFeeModal(false);
+                  }}
+                >
+                  <View>
+                    <Text style={styles.feeOptionTitle}>Old Patient</Text>
+                    <Text style={styles.feeAmount}>₹{oldPatientFee || consultationFee}</Text>
+                  </View>
+                  <Icon
+                    name={patientType === 'old' ? "record-circle" : "circle-outline"}
+                    size={24}
+                    color="#E66A2C"
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowFeeModal(false)}
+                >
+                  <Text style={styles.modalCloseText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -535,15 +608,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     marginTop: 20,
-    fontFamily: 'Poppins-SemiBold',
-  },
-
-  selectedSlot: { backgroundColor: '#000', fontFamily: 'Poppins-Medium' },
-  bookedSlot: { backgroundColor: '#000', borderColor: '#000' },
-
-  slotText: {
-    color: '#ff5722',
-    fontWeight: '500',
     fontFamily: 'Poppins-SemiBold',
   },
 
@@ -641,5 +705,67 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  feeOption: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#eee',
+    marginBottom: 12,
+  },
+  feeOptionSelected: {
+    borderColor: '#E66A2C',
+    backgroundColor: '#fff7f2',
+  },
+  feeOptionTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#333',
+  },
+  feeAmount: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    color: '#E66A2C',
+  },
+  modalCloseButton: {
+    marginTop: 10,
+    padding: 10,
+  },
+  modalCloseText: {
+    fontSize: 15,
+    fontFamily: 'Poppins-Medium',
+    color: '#888',
   },
 });
