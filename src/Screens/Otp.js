@@ -101,6 +101,7 @@ const Otp = () => {
     } catch (error) {
       console.error('Verification Error:', error);
       const message =
+        error?.response?.data?.error ||
         error?.response?.data?.message ||
         error?.message ||
         'Verification failed';
@@ -136,7 +137,10 @@ const Otp = () => {
       }
     } catch (error) {
       const message =
-        error?.response?.data?.message || error?.message || 'Failed to send OTP';
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to send OTP';
       Alert.alert('Error', message);
     } finally {
       setResending(false);

@@ -98,7 +98,13 @@ const Chat = () => {
             file: fileUrl,
             fileName: fileName,
             mimeType: mimeType,
-            sender: msg.sender_type === 'doctor' ? 'doctor' : 'user',
+            sender:
+              msg.sender_type?.toLowerCase().includes('doctor') ||
+                msg.sender_type?.toLowerCase().includes('staff') ||
+                msg.sender_type?.toLowerCase().includes('admin') ||
+                msg.sender_type?.toLowerCase().includes('system')
+                ? 'doctor'
+                : 'user',
             time: msg.created_at
               ? new Date(msg.created_at).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -393,7 +399,9 @@ const Chat = () => {
               source={
                 doctorImage
                   ? {
-                    uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctorImage}`,
+                    uri: doctorImage.startsWith('http')
+                      ? doctorImage
+                      : `https://argosmob.uk/bhardwaj-hospital/storage/app/public/${doctorImage}`,
                   }
                   : require('../assets/Images/Doctor.png')
               }
@@ -460,7 +468,13 @@ const styles = StyleSheet.create({
   chatContainer: { paddingHorizontal: 16, paddingVertical: 12, flexGrow: 1 },
   messageBubble: { maxWidth: '75%', padding: 12, borderRadius: 14, marginBottom: 10 },
   userBubble: { backgroundColor: '#E66A2C', alignSelf: 'flex-end', borderTopRightRadius: 4 },
-  doctorBubble: { backgroundColor: '#F2F2F2', alignSelf: 'flex-start', borderTopLeftRadius: 4 },
+  doctorBubble: {
+    backgroundColor: '#FFFFFF',
+    alignSelf: 'flex-start',
+    borderTopLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
   messageText: { fontSize: 14, lineHeight: 20, fontFamily: 'Poppins-Regular' },
   userText: { color: '#fff' },
   doctorText: { color: '#000' },

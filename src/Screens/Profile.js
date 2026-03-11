@@ -24,6 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { baseURL } from '../utils/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import packageJson from '../../package.json';
 
 const Profile = () => {
   const fileName = user?.profile_picture?.split('/').pop();
@@ -33,6 +34,8 @@ const Profile = () => {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const APP_VERSION = packageJson.version; // Current Local Version from package.json
   console.log(user);
 
   // 👉 Fetch User Profile
@@ -57,9 +60,24 @@ const Profile = () => {
     }
   };
 
+  const checkUpdate = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/app-version`);
+      if (response.data.status) {
+        const { latest_version } = response.data.data;
+        if (latest_version > APP_VERSION) {
+          setUpdateInfo(response.data.data);
+        }
+      }
+    } catch (error) {
+      console.log('Update check failed', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
+      checkUpdate();
     }, []),
   );
 
@@ -208,20 +226,21 @@ const Profile = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={26} color="#000" />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Icon name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={{ width: 26 }} />
+        <Text style={styles.headerTitle}>Profile Dashboard</Text>
+        <View style={{ width: 40 }} />
       </View>
+
       <ScrollView
-        style={{ paddingHorizontal: 16 }}
+        style={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Image + Name */}
+        {/* Profile Section */}
         <View style={styles.profileSection}>
-          <TouchableOpacity onPress={openGallery} activeOpacity={0.8}>
-            <View style={{ position: 'relative' }}>
+          <TouchableOpacity onPress={openGallery} activeOpacity={0.9}>
+            <View style={styles.imageWrapper}>
               <Image
                 source={
                   localImage
@@ -234,124 +253,133 @@ const Profile = () => {
                 }
                 style={styles.profileImage}
               />
-
-              {/* Camera icon overlay */}
-              <View style={styles.cameraIcon}>
-                <Image
-                  source={require('../assets/camera.png')}
-                  style={{ width: 22, height: 22 }}
-                />
+              <View style={styles.cameraIconContainer}>
+                <Icon name="camera-plus" size={16} color="#fff" />
               </View>
             </View>
           </TouchableOpacity>
-
-          <Text style={styles.profileName}>{user?.name || 'Unknown'}</Text>
-          <Text style={styles.profileRole}>Patient</Text>
+          <Text style={styles.userNameText}>{user?.name || 'User Name'}</Text>
+          <View style={styles.patientIdBadge}>
+            <Text style={styles.patientIdText}>ID: {user?.patient_id || 'PH-00000'}</Text>
+          </View>
         </View>
 
-        {/* Personal Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+        {/* Update Banner - Only if update exists */}
+        {updateInfo && (
+          <TouchableOpacity
+            onPress={() => openExternalLink(updateInfo.update_url)}
+            style={styles.updateCard}
+            activeOpacity={0.8}
+          >
+            <View style={styles.updateAlertIcon}>
+              <Icon name="rocket" size={22} color="#fff" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.updateTitleText}>New Update {updateInfo.latest_version}</Text>
+              <Text style={styles.updateSubtitleText}>Get the latest features and bug fixes now.</Text>
+            </View>
+            <View style={styles.updateBtnSmall}>
+              <Text style={styles.updateBtnTextSmall}>Update</Text>
+            </View>
+          </TouchableOpacity>
+        )}
 
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.info}>{user?.email}</Text>
+        {/* Info Card */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionHeading}>Personal Details</Text>
 
-          <Text style={styles.label}>Phone</Text>
-          <Text style={styles.info}>{user?.phone || 'Not Provided'}</Text>
+          <View style={styles.infoRow}>
+            <View style={[styles.iconBox, { backgroundColor: '#E3F2FD' }]}>
+              <Icon name="email-outline" size={20} color="#1976D2" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Email Address</Text>
+              <Text style={styles.infoValue}>{user?.email || 'N/A'}</Text>
+            </View>
+          </View>
 
-          <Text style={styles.label}>Address</Text>
-          <Text style={styles.info}>{user?.address || 'No Address Added'}</Text>
+          <View style={styles.infoRow}>
+            <View style={[styles.iconBox, { backgroundColor: '#E8F5E9' }]}>
+              <Icon name="phone-outline" size={20} color="#388E3C" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Phone Number</Text>
+              <Text style={styles.infoValue}>{user?.phone || 'Add phone number'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoRow}>
+            <View style={[styles.iconBox, { backgroundColor: '#FFF3E0' }]}>
+              <Icon name="map-marker-outline" size={20} color="#F57C00" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Residential Address</Text>
+              <Text style={styles.infoValue}>{user?.address || 'No address added yet'}</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Account Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
+        {/* Settings Card */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionHeading}>Account Settings</Text>
+
           <TouchableOpacity
             onPress={() => navigation.navigate('UpdateProfile', { user })}
-            style={styles.settingRow}
+            style={styles.menuItem}
           >
-            <Text style={styles.settingText}>Edit Profile</Text>
-            <Icon name="pencil-outline" size={22} color="#E66A2C" />
+            <View style={styles.menuLeft}>
+              <Icon name="account-edit-outline" size={22} color="#555" />
+              <Text style={styles.menuText}>Edit Profile</Text>
+            </View>
+            <Icon name="chevron-right" size={20} color="#BBB" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout} style={styles.settingRow}>
-            <Text style={styles.settingText}>Logout</Text>
-            <Icon name="arrow-right" size={22} color="#E66A2C" />
-          </TouchableOpacity>
+
           <TouchableOpacity
-
-            style={styles.settingRow}
+            style={styles.menuItem}
           >
-            <Text style={[styles.settingText]}>Rate Our App</Text>
-            <Icon name="star-outline" size={22} color="#E66A2C" />
+            <View style={styles.menuLeft}>
+              <Icon name="star-outline" size={22} color="#555" />
+              <Text style={styles.menuText}>Rate Our App</Text>
+            </View>
+            <Icon name="chevron-right" size={20} color="#BBB" />
           </TouchableOpacity>
-          <Text
-            style={[
-              styles.settingText,
-              {
-                paddingVertical: 12,
-                textAlign: 'center',
-                fontFamily: 'Poppins-SemiBold',
-                marginTop: 10
-              },
-            ]}
-          >
-            Happy with the service, Kindly update your review.
-          </Text>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              marginVertical: 20,
-              justifyContent: 'center',
-              backgroundColor: '',
-              alignItems: 'center',
-              gap: 50,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() =>
-                openExternalLink('https://g.page/r/CTVasghVlFBqEBM/review')
-              }
-              activeOpacity={0.8}
-            >
-              <Image
-                source={require('../assets/google.png')}
-                style={{ width: 50, height: 50 }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                openExternalLink('https://jsdl.in/RSL-PZK1769154268')
-              }
-              activeOpacity={0.8}
-            >
-              <Image
-                source={require('../assets/star-rating.png')}
-                style={{ width: 50, height: 50 }}
-              />
+          <TouchableOpacity onPress={handleLogout} style={[styles.menuItem, { borderBottomWidth: 0 }]}>
+            <View style={styles.menuLeft}>
+              <Icon name="logout" size={22} color="#D32F2F" />
+              <Text style={[styles.menuText, { color: '#D32F2F' }]}>Logout</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Review Section */}
+        <View style={styles.reviewSection}>
+          <Text style={styles.reviewFeedbackText}>Happy with our service? Leave a review!</Text>
+
+          <View style={styles.reviewLogoRow}>
+            <TouchableOpacity onPress={() => openExternalLink('https://g.page/r/CTVasghVlFBqEBM/review')}>
+              <Image source={require('../assets/google.png')} style={styles.reviewIcon} />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL('https://prac.to/IPRCTO/7JZjUBNu').catch(err =>
-                  console.error('Failed to open URL:', err),
-                )
-              }
-              activeOpacity={0.8}
-            >
-              <Image
-                source={require('../assets/practo_logo.png')}
-                style={{ width: 120, height: 120, resizeMode: 'contain' }}
-              />
+            <TouchableOpacity onPress={() => openExternalLink('https://jsdl.in/RSL-PZK1769154268')}>
+              <Image source={require('../assets/star-rating.png')} style={styles.reviewIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => Linking.openURL('https://prac.to/IPRCTO/7JZjUBNu')}>
+              <Image source={require('../assets/practo_logo.png')} style={styles.practoIcon} />
             </TouchableOpacity>
           </View>
         </View>
+
+        <Text style={styles.versionTag}>App Release V{APP_VERSION}</Text>
+        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default Profile;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -360,92 +388,211 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
-    flex: 1,
-    textAlign: 'center',
     fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
+    color: '#333',
     fontFamily: 'Poppins-SemiBold',
+  },
+  scrollContent: {
+    flex: 1,
   },
   profileSection: {
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  imageWrapper: {
+    padding: 5,
+    backgroundColor: '#fff',
+    borderRadius: 65,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
   },
-  profileName: {
-    fontSize: 20,
-    marginTop: 10,
-    color: '#000',
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: '#E66A2C',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  userNameText: {
+    fontSize: 22,
+    color: '#333',
     fontFamily: 'Poppins-SemiBold',
+    marginTop: 12,
   },
-  profileRole: {
-    color: '#888',
-    fontSize: 14,
+  patientIdBadge: {
+    backgroundColor: '#F3F4F9',
+    paddingHorizontal: 15,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginTop: 5,
+  },
+  patientIdText: {
+    color: '#666',
+    fontSize: 13,
     fontFamily: 'Poppins-Medium',
   },
-  section: {
-    marginTop: 30,
+  updateCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    elevation: 4,
+    borderLeftWidth: 5,
+    borderLeftColor: '#E66A2C',
   },
-  sectionTitle: {
-    fontSize: 16,
-    // fontWeight: '700',
-    color: '#000',
-    marginBottom: 10,
-    fontFamily: 'Poppins-SemiBold',
+  updateAlertIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    backgroundColor: '#E66A2C',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  label: {
-    color: '#777',
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-  },
-  info: {
+  updateTitleText: {
     fontSize: 15,
-    color: '#000',
-    marginBottom: 10,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#333',
+  },
+  updateSubtitleText: {
+    fontSize: 12,
+    color: '#777',
     fontFamily: 'Poppins-Regular',
   },
-  chatButton: {
+  updateBtnSmall: {
+    backgroundColor: '#FFF3E0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  updateBtnTextSmall: {
+    color: '#E66A2C',
+    fontSize: 12,
+    fontFamily: 'Poppins-Bold',
+  },
+  infoCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 20,
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+  },
+  sectionHeading: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginBottom: 18,
   },
-  chatText: {
-    fontSize: 15,
-    color: '#000',
-    marginRight: 205,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  iconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 0.4,
-    borderColor: '#ddd',
   },
-  settingText: {
-    fontSize: 15,
-    color: '#000',
+  infoContent: {
+    marginLeft: 15,
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 11,
+    color: '#999',
+    fontFamily: 'Poppins-Regular',
+  },
+  infoValue: {
+    fontSize: 14,
+    color: '#444',
     fontFamily: 'Poppins-Medium',
   },
-
-  cameraIcon: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 6,
-    elevation: 4,
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F8F9FA',
+  },
+  menuLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuText: {
+    fontSize: 14,
+    color: '#444',
+    fontFamily: 'Poppins-Medium',
+    marginLeft: 12,
+  },
+  reviewSection: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginTop: 10,
+  },
+  reviewFeedbackText: {
+    fontSize: 14,
+    color: '#666',
+    fontFamily: 'Poppins-Medium',
+    marginBottom: 15,
+  },
+  reviewLogoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 30,
+  },
+  reviewIcon: {
+    width: 44,
+    height: 44,
+  },
+  practoIcon: {
+    width: 90,
+    height: 44,
+    resizeMode: 'contain',
+  },
+  versionTag: {
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#BBB',
+    fontFamily: 'Poppins-Regular',
+    marginTop: 20,
   },
 });

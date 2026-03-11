@@ -13,14 +13,19 @@ import {
   Linking,
   FlatList,
   BackHandler,
+  Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { baseURL } from '../utils/api';
+import packageJson from '../../package.json';
+const APP_SESSION_ID = Date.now(); // Unique ID for this app run
+let isUpdatePopupDismissed = false; // Session-level flag
 
 const Home = () => {
+  const APP_VERSION = packageJson.version;
   const navigation = useNavigation();
   const [doctor, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +34,9 @@ const Home = () => {
   const [imageKey, setImageKey] = useState(Date.now());
   const FAV_KEY = 'FAV_DOCTORS';
   const [banner, setBanner] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -132,6 +140,59 @@ const Home = () => {
     }
   };
 
+  const openUpdateLink = async (url) => {
+    if (!url) {
+      Alert.alert('Error', 'Update link is not available');
+      return;
+    }
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        // Fallback for some android versions where canOpenURL might fail for store links
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      Alert.alert('Update Error', 'Could not open Play Store. Please update manually.');
+      console.log('Linking Error:', error);
+    }
+  };
+
+  const checkUpdate = async () => {
+    if (isUpdatePopupDismissed) return; // Don't show again in this session
+
+    try {
+      const response = await axios.get(`${baseURL}/app-version`);
+      if (response.data.status) {
+        const { latest_version } = response.data.data;
+        if (latest_version !== APP_VERSION) {
+          setUpdateInfo(response.data.data);
+          setShowUpdateModal(true);
+        }
+      }
+    } catch (error) {
+      console.log('Update check failed:', error);
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) return;
+
+      const response = await axios.get(`${baseURL}/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        setUnreadCount(response.data.unread_count);
+      }
+    } catch (error) {
+      console.log('Error fetching unread count:', error);
+    }
+  };
+
   const toggleFavourite = async doctorId => {
     try {
       doctorId = Number(doctorId);
@@ -152,11 +213,10 @@ const Home = () => {
 
   // Initial load
   useEffect(() => {
-    getDoctors();
     getuserinfo();
     getToken();
     loadFavourites();
-    getBanner();
+    console.log('Current App Version:', APP_VERSION);
   }, []);
 
   // ✅ REFRESH USER DATA WHEN SCREEN COMES INTO FOCUS
@@ -164,8 +224,12 @@ const Home = () => {
     useCallback(() => {
       console.log('🔄 Screen focused - refreshing user data');
       setImageKey(Date.now());
+      getDoctors();
+      getBanner();
+      checkUpdate();
       getuserinfo();
       loadFavourites();
+      fetchUnreadCount();
     }, []),
   );
   const actionButtons = [
@@ -221,6 +285,13 @@ const Home = () => {
                     onPress={() => navigation.navigate('Notifications')}
                   >
                     <Icon name="bell-outline" size={28} color="#E66A2C" />
+                    {unreadCount > 0 && (
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
 
                   <Image
@@ -337,6 +408,56 @@ const Home = () => {
             )
           }
         />
+
+        {/* Update Modal */}
+        <Modal
+          visible={showUpdateModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowUpdateModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.updateModalContent}>
+              <View style={styles.updateIconContainer}>
+                <Icon name="rocket-launch" size={50} color="#E66A2C" />
+              </View>
+              <Text style={styles.updateModalTitle}>New Update Available!</Text>
+              <Text style={styles.updateModalMessage}>
+                {updateInfo?.update_message || 'A new version of the app is available. Please update to continue using the latest features.'}
+              </Text>
+
+              <View style={styles.versionInfoContainer}>
+                <View style={styles.versionTagItem}>
+                  <Text style={styles.versionLabel}>Current</Text>
+                  <Text style={styles.versionText}>V{APP_VERSION}</Text>
+                </View>
+                <Icon name="arrow-right-thin" size={24} color="#DDD" />
+                <View style={styles.versionTagItem}>
+                  <Text style={styles.versionLabel}>Latest</Text>
+                  <Text style={[styles.versionText, { color: '#E66A2C' }]}>V{updateInfo?.latest_version}</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.updateNowBtn}
+                onPress={() => openUpdateLink(updateInfo?.update_url)}
+              >
+                <Text style={styles.updateNowBtnText}>Update Now</Text>
+                <Icon name="arrow-right" size={20} color="#fff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.maybeLaterBtn}
+                onPress={() => {
+                  setShowUpdateModal(false);
+                  isUpdatePopupDismissed = true; // Set flag to not show again
+                }}
+              >
+                <Text style={styles.maybeLaterBtnText}>Maybe Later</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );
@@ -373,6 +494,26 @@ const styles = StyleSheet.create({
   },
   bellIcon: {
     marginRight: 10,
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    right: -5,
+    top: -5,
+    backgroundColor: '#FF3D00',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontFamily: 'Poppins-Bold',
   },
   profileImage: {
     width: 40,
@@ -469,5 +610,106 @@ const styles = StyleSheet.create({
     color: '#ff8800',
     fontSize: 13,
     fontFamily: 'Poppins-Regular',
+  },
+  // Update Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  updateModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    width: '100%',
+    padding: 25,
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  updateIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FFF3E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  updateModalTitle: {
+    fontSize: 22,
+    fontFamily: 'Poppins-Bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  updateModalMessage: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  versionInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8F9FA',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    marginBottom: 25,
+    gap: 15,
+  },
+  versionTagItem: {
+    alignItems: 'center',
+  },
+  versionLabel: {
+    fontSize: 10,
+    color: '#999',
+    fontFamily: 'Poppins-Medium',
+    textTransform: 'uppercase',
+  },
+  versionText: {
+    fontSize: 15,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#444',
+  },
+  updateNowBtn: {
+    backgroundColor: '#E66A2C',
+    width: '100%',
+    height: 55,
+    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+    elevation: 5,
+    shadowColor: '#E66A2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  updateNowBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+  },
+  maybeLaterBtn: {
+    padding: 12,
+    width: '100%',
+    alignItems: 'center',
+  },
+  maybeLaterBtnText: {
+    color: '#999',
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
   },
 });

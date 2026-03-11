@@ -17,6 +17,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { baseURL } from '../utils/api';
+import { Picker } from '@react-native-picker/picker';
+import DatePicker from 'react-native-date-picker';
+import { Platform } from 'react-native';
 
 const Form = ({ route }) => {
   const navigation = useNavigation();
@@ -30,11 +33,16 @@ const Form = ({ route }) => {
     password: '',
     gender: '',
     age: '',
+    date_of_birth: '',
     address: '',
     emergencyContact: '',
     alternateContact: '',
     history: '',
+    patientId: '',
   });
+
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
 
   const [photo, setPhoto] = useState(null);
 
@@ -306,6 +314,7 @@ const Form = ({ route }) => {
         emergency_contact_number: form.emergencyContact,
         alternate_contact_number: form.alternateContact,
         basic_medical_history: form.history,
+        date_of_birth: form.date_of_birth,
       };
 
       let response;
@@ -395,7 +404,13 @@ const Form = ({ route }) => {
         emergencyContact: user.emergency_contact_number || '',
         alternateContact: user.alternate_contact_number || '',
         history: user.basic_medical_history || '',
+        patientId: user.patient_id || '',
+        date_of_birth: user.date_of_birth || '',
       });
+
+      if (user.date_of_birth) {
+        setDate(new Date(user.date_of_birth));
+      }
 
       if (user.profile_image) {
         setPhoto(user.profile_image);
@@ -445,17 +460,50 @@ const Form = ({ route }) => {
 
         {/* Gender */}
         <Text style={styles.label}>Gender</Text>
-        {/* <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={form.gender}
-              onValueChange={val => setForm({ ...form, gender: val })}
-            >
-              <Picker.Item label="Select gender" value="" />
-              <Picker.Item label="Male" value="male" />
-              <Picker.Item label="Female" value="female" />
-              <Picker.Item label="Other" value="other" />
-            </Picker>
-          </View> */}
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={form.gender}
+            onValueChange={val => setForm({ ...form, gender: val })}
+            dropdownIconColor="#000"
+            mode="dropdown"
+          >
+            <Picker.Item label="Select gender" value="" />
+            <Picker.Item label="Male" value="male" />
+            <Picker.Item label="Female" value="female" />
+            <Picker.Item label="Other" value="other" />
+          </Picker>
+        </View>
+
+        {/* Date of Birth */}
+        <Text style={styles.label}>Date of Birth</Text>
+        <TouchableOpacity
+          style={styles.input}
+          onPress={() => setOpen(true)}
+        >
+          <Text style={{ color: form.date_of_birth ? '#000' : '#888' }}>
+            {form.date_of_birth || 'Select date of birth'}
+          </Text>
+        </TouchableOpacity>
+
+        <DatePicker
+          modal
+          open={open}
+          date={date}
+          mode="date"
+          onConfirm={date => {
+            setOpen(false);
+            setDate(date);
+            const formattedDate = date.toISOString().split('T')[0];
+            setForm({ ...form, date_of_birth: formattedDate });
+
+            // Recalculate age
+            const age = new Date().getFullYear() - date.getFullYear();
+            setForm(prev => ({ ...prev, age: String(age), date_of_birth: formattedDate }));
+          }}
+          onCancel={() => {
+            setOpen(false);
+          }}
+        />
 
         {/* Age */}
         <Text style={styles.label}>Age</Text>
@@ -505,6 +553,14 @@ const Form = ({ route }) => {
           placeholder="Enter medical history"
           value={form.history}
           onChangeText={val => setForm({ ...form, history: val })}
+        />
+
+        {/* Patient ID */}
+        <Text style={styles.label}>Patient ID</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: '#e9e9e9' }]}
+          value={form.patientId}
+          editable={false}
         />
 
         {/* Upload */}

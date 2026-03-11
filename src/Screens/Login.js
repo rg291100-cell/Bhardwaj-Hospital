@@ -62,8 +62,10 @@ const Login = () => {
       //   setError(response.data.message || 'Something went wrong');
       // }
     } catch (err) {
-      console.log('Error:', err);
-      setError('Server error, try again later');
+      console.log('Error:', err.response?.data || err.message);
+      // Prioritize the detailed 'error' description, then the 'message'
+      const backendError = err.response?.data?.error || err.response?.data?.message;
+      setError(backendError || 'Server error, try again later');
     }
 
     setLoading(false);
