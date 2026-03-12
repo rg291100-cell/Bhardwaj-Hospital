@@ -135,21 +135,24 @@ const Appointment = () => {
   /* ===================== JOIN ENABLE LOGIC ===================== */
   const isJoinEnabled = appointment => {
     if (!appointment.appointment_date || !appointment.start_time) return false;
-
-    const appointmentDateTime = new Date(
-      `${appointment.appointment_date} ${appointment.start_time}`,
-    );
-
+    const appointmentDateTime = new Date(`${appointment.appointment_date} ${appointment.start_time}`);
     const now = new Date();
-
-    // Allow join 5 minutes before start time
     const ALLOW_BEFORE_MINUTES = 5;
     const diffMinutes = (appointmentDateTime - now) / 60000;
-
     return diffMinutes <= ALLOW_BEFORE_MINUTES;
   };
 
-  /* ===================== STATUS HELPERS ===================== */
+  const isJoinWindowClosed = appointment => {
+    if (!appointment.appointment_date || !appointment.start_time) return true;
+    const startDateTime = new Date(`${appointment.appointment_date} ${appointment.start_time}`);
+    const now = new Date();
+    const ALLOW_BEFORE_MINUTES = 5;
+    const ALLOW_AFTER_MINUTES = 15;
+    const joinStartTime = new Date(startDateTime.getTime() - ALLOW_BEFORE_MINUTES * 60000);
+    const joinEndTime = new Date(startDateTime.getTime() + ALLOW_AFTER_MINUTES * 60000);
+    return now < joinStartTime || now > joinEndTime;
+  };
+
   const getStatusStyle = status => {
     switch (status) {
       case 'scheduled':
@@ -166,123 +169,22 @@ const Appointment = () => {
 
   const getStatusText = status => {
     switch (status) {
-      case 'scheduled':
-        return 'Scheduled';
-      case 'confirmed':
-        return 'Confirmed';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return status;
+      case 'scheduled': return 'Scheduled';
+      case 'confirmed': return 'Confirmed';
+      case 'completed': return 'Completed';
+      case 'cancelled': return 'Cancelled';
+      default: return status;
     }
   };
-  // const isAppointmentInPast = appointment => {
-  //   if (!appointment.appointment_date || !appointment.start_time) return false;
-
-  //   const appointmentDateTime = new Date(
-  //     `${appointment.appointment_date} ${appointment.start_time}`
-  //   );
-
-  //   return new Date() > appointmentDateTime;
-  // };
-  const isJoinWindowClosed = appointment => {
-    if (!appointment.appointment_date || !appointment.start_time) return true;
-
-    const startDateTime = new Date(
-      `${appointment.appointment_date} ${appointment.start_time}`
-    );
-
-    const now = new Date();
-
-    const ALLOW_BEFORE_MINUTES = 5;
-    const ALLOW_AFTER_MINUTES = 15; // grace period after start
-
-    const joinStartTime = new Date(
-      startDateTime.getTime() - ALLOW_BEFORE_MINUTES * 60000
-    );
-
-    const joinEndTime = new Date(
-      startDateTime.getTime() + ALLOW_AFTER_MINUTES * 60000
-    );
-
-    return now < joinStartTime || now > joinEndTime;
-  };
-
-
-  /* ===================== HANDLE JOIN BUTTON PRESS ===================== */
-  // Updated handleJoinPress with better debugging
-
-  // const handleJoinPress = async (appointmentId) => {
-  //   console.log('🎯 JOIN PRESSED');
-  //   console.log('Appointment ID:', appointmentId);
-
-  //   try {
-  //     const token = await AsyncStorage.getItem('access_token');
-  //     if (!token) {
-  //       Alert.alert('Error', 'Please login again');
-  //       return;
-  //     }
-
-  //     const response = await axios.get(
-  //       `${BASE_URL}/video-call/active-call`,
-  //       {
-  //         params: { appointment_id: appointmentId },
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           Accept: 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     console.log('✅ Active Call Response:', response.data);
-  //     console.log('✅ Active Call id :', response?.data?.data?.call_id);
-  // const callId = response?.data?.data?.call_id;
-
-  // {{baseURL}}/video-call/join
-
-  // {
-  //     "call_id" : 9
-  // }
-
-  // this is how denfint the callId to this api
-
-  //     // if (response.data?.success) {
-  //     //   navigation.navigate('VideoCall', {
-  //     //     appointmentId,
-  //       // });
-  //     // } else {
-  //     //   Alert.alert(
-  //     //     'Call Not Started',
-  //     //     response.data?.message || 'Doctor has not started the call yet',
-  //     //   );
-  //     // }
-
-  //   } catch (error) {
-  //     console.log('❌ ERROR:', error.response?.data || error.message);
-
-  //     Alert.alert(
-  //       'Error',
-  //       error.response?.data?.message || 'Something went wrong',
-  //     );
-  //   }
-  // };
 
   const handleJoinPress = async appointmentId => {
-    console.log('🎯 JOIN PRESSED');
-    console.log('Appointment ID:', appointmentId);
-
     try {
-      // Get token
       const token = await AsyncStorage.getItem('access_token');
       if (!token) {
         Alert.alert('Error', 'Please login again');
         return;
       }
-      console.log('token', token);
 
-      // 1️⃣ Get active call for this appointment
       const activeCallResponse = await axios.get(
         `${BASE_URL}/video-call/active-call`,
         {
@@ -294,18 +196,12 @@ const Appointment = () => {
         },
       );
 
-      console.log('✅ Active Call Response:', activeCallResponse.data);
-
-      // Extract call_id
       const callId = activeCallResponse?.data?.data?.call_id;
       if (!callId) {
         Alert.alert('Call Not Started', 'Doctor has not started the call yet');
         return;
       }
 
-      console.log('✅ Call ID to join:', callId);
-
-      // 2️⃣ Join the call
       const joinResponse = await axios.post(
         `${BASE_URL}/video-call/join`,
         { call_id: callId },
@@ -317,29 +213,19 @@ const Appointment = () => {
         },
       );
 
-      console.log('✅ sending the call id  Join Response:', joinResponse.data);
-
       navigation.navigate('VideoCall', {
         appointmentId,
-        // callId,
         channelName: joinResponse?.data?.data?.channel_name,
         agoraToken: joinResponse?.data?.data?.token,
         uid: joinResponse?.data?.data?.uid,
       });
     } catch (error) {
-      console.log('❌ ERROR:', error.response?.data || error.message);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Something went wrong',
-      );
+      Alert.alert('Error', error.response?.data?.message || 'Something went wrong');
     }
   };
 
-  /* ===================== APPOINTMENT CARD ===================== */
   const renderAppointmentCard = (appointment, index) => {
-    const doctorName = `${appointment.doctor?.first_name || ''} ${appointment.doctor?.last_name || ''
-      }`.trim();
-
+    const doctorName = `${appointment.doctor?.first_name || ''} ${appointment.doctor?.last_name || ''}`.trim();
     const joinEnabled = isJoinEnabled(appointment);
 
     return (
@@ -376,7 +262,7 @@ const Appointment = () => {
             </Text>
           </View>
 
-          {/* ===================== JOIN BUTTON ===================== */}
+          {/* JOIN BUTTON */}
           <View>
             {appointment.status === 'scheduled' &&
               appointment.type === 'video' &&
@@ -397,7 +283,6 @@ const Appointment = () => {
 
             <TouchableOpacity
               onPress={() => {
-                console.log('Prescription appointment ID:', appointment.id);
                 navigation.navigate('ReportsScreen', { appointmentId: appointment.id });
               }} style={[
                 styles.joinButton,
@@ -418,16 +303,12 @@ const Appointment = () => {
     );
   };
 
-  /* ===================== UI ===================== */
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
       <View style={styles.header}>
-        {/* <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={26} />
-        </TouchableOpacity> */}
         <View />
         <Text style={styles.headerTitle}>Appointments</Text>
         <TouchableOpacity onPress={getAppointment}>
@@ -473,7 +354,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
 
-  /* ================= HEADER ================= */
+  /* HEADER */
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -492,7 +373,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
   },
 
-  /* ================= SECTIONS ================= */
+  /* SECTIONS */
   section: {
     paddingHorizontal: 16,
     marginTop: 18,
@@ -505,7 +386,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
   },
 
-  /* ================= APPOINTMENT CARD ================= */
+  /* APPOINTMENT CARD */
   appointmentRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -540,7 +421,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
   },
 
-  /* ================= STATUS ================= */
+  /* STATUS */
   statusConfirmed: {
     color: '#248907',
     fontSize: 13,
@@ -559,7 +440,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
   },
 
-  /* ================= JOIN BUTTON ================= */
+  /* JOIN BUTTON */
   joinButton: {
     backgroundColor: '#248907',
     paddingHorizontal: 16,
@@ -580,7 +461,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
   },
 
-  /* ================= STATES ================= */
+  /* STATES */
   centerContainer: {
     flex: 1,
     justifyContent: 'center',

@@ -264,25 +264,7 @@ const Profile = () => {
           </View>
         </View>
 
-        {/* Update Banner - Only if update exists */}
-        {updateInfo && (
-          <TouchableOpacity
-            onPress={() => openExternalLink(updateInfo.update_url)}
-            style={styles.updateCard}
-            activeOpacity={0.8}
-          >
-            <View style={styles.updateAlertIcon}>
-              <Icon name="rocket" size={22} color="#fff" />
-            </View>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.updateTitleText}>New Update {updateInfo.latest_version}</Text>
-              <Text style={styles.updateSubtitleText}>Get the latest features and bug fixes now.</Text>
-            </View>
-            <View style={styles.updateBtnSmall}>
-              <Text style={styles.updateBtnTextSmall}>Update</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+
 
         {/* Info Card */}
         <View style={styles.infoCard}>

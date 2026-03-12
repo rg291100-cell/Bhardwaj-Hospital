@@ -74,44 +74,64 @@ const ReportView = ({ route }) => {
     }
     .header {
       text-align: center;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 4px solid #ff5722;
+      margin-bottom: 20px;
     }
     h1 { 
-      color: #ff5722; 
-      font-size: 32px;
-      margin-bottom: 8px;
+      color: #1a202c; 
+      font-size: 28px;
+      margin-bottom: 4px;
       font-weight: 700;
+      text-transform: uppercase;
     }
-    .report-type {
-      color: #666;
+    .address {
+      font-size: 12px;
+      color: #4a5568;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    hr {
+      border: 0;
+      border-top: 2px dashed #000;
+      margin-bottom: 20px;
+    }
+    .report-title-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .report-title-text {
       font-size: 18px;
-      font-style: italic;
-      margin-top: 8px;
-    }
-    .section {
-      margin: 30px 0;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 10px;
-      border-left: 6px solid #ff5722;
-    }
-    .section-title {
-      color: #ff5722;
-      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 15px;
+      text-decoration: underline;
     }
-    .field {
-      margin: 12px 0;
-      font-size: 15px;
+    .info-grid {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
     }
-    .field strong {
-      color: #000;
-      font-weight: 600;
-      min-width: 150px;
+    .info-col {
+      width: 48%;
+    }
+    .info-field {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .info-field strong {
       display: inline-block;
+      width: 100px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+      font-weight: bold;
     }
     .value {
       color: #555;
@@ -119,51 +139,73 @@ const ReportView = ({ route }) => {
     }
     .footer {
       margin-top: 50px;
-      padding-top: 20px;
-      border-top: 2px solid #ddd;
-      text-align: center;
-      color: #999;
-      font-size: 13px;
+      text-align: right;
+      color: #000;
+      font-weight: bold;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>${report.report_title || 'Medical Report'}</h1>
-    <div class="report-type">${report.report_type || 'General Report'}</div>
+    <h1>BHARDWAJ HOSPITAL</h1>
+    <div class="address">
+      D 65/336,<br>
+      LAHARTARA, BAULIYA LAHARTARA VARANASI<br>
+      UTTAR PRADESH 221002
+    </div>
+  </div>
+  
+  <hr>
+
+  <div class="report-title-box">
+    <span class="report-title-text">Medical Report</span>
   </div>
 
-  <div class="section">
-    <div class="section-title">Patient Details</div>
-    <div class="field"><strong>Name:</strong> <span class="value">${report.patient?.name || 'N/A'
-      }</span></div>
-    <div class="field"><strong>Gender:</strong> <span class="value">${report.patient?.gender || 'N/A'
-      }</span></div>
-    <div class="field"><strong>Phone:</strong> <span class="value">${report.patient?.phone || 'N/A'
-      }</span></div>
+  <div class="info-grid">
+    <div class="info-col">
+      <div class="info-field"><strong>Report ID:</strong> INV-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${report.id}</div>
+      <div class="info-field"><strong>Patient Name:</strong> ${report.patient?.name || 'N/A'}</div>
+      <div class="info-field"><strong>Patient Id:</strong> ${report.patient?.id ? 'PID' + String(report.patient.id).padStart(6, '0') : 'N/A'}</div>
+    </div>
+    <div class="info-col">
+      <div class="info-field"><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')}</div>
+      <div class="info-field"><strong>Gender:</strong> ${report.patient?.gender || 'N/A'}</div>
+      <div class="info-field"><strong>Phone:</strong> ${report.patient?.phone || 'N/A'}</div>
+    </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">Doctor</div>
-    <div class="field"><strong>Name:</strong> <span class="value">${report.doctor?.name || 'N/A'
-      }</span></div>
-  </div>
+  <hr>
 
-  <div class="section">
-    <div class="section-title">Diagnosis</div>
-    <div class="field"><span class="value">${report.diagnosis || 'N/A'
-      }</span></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Treatment Plan</div>
-    <div class="field"><span class="value">${report.treatment_plan || 'N/A'
-      }</span></div>
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%">Report Details</th>
+        <th style="width: 70%">Information</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Title</strong></td>
+        <td>${report.report_title || 'N/A'}</td>
+      </tr>
+      <tr>
+        <td><strong>Type</strong></td>
+        <td>${report.report_type || 'N/A'}</td>
+      </tr>
+      <tr>
+        <td><strong>Doctor</strong></td>
+        <td>${report.doctor?.name || 'Hospital Staff'}</td>
+      </tr>
+      <tr>
+        <td><strong>Notes</strong></td>
+        <td>${report.notes || 'N/A'}</td>
+      </tr>
+    </tbody>
+  </table>
 
   <div class="footer">
-    <p><strong>Bhardwaj Hospital</strong></p>
-    <p>Generated on ${new Date().toLocaleDateString('en-IN')}</p>
+    <p>Sign / Stamp</p>
   </div>
 </body>
 </html>`;
@@ -274,42 +316,75 @@ const ReportView = ({ route }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Report Info */}
-        <View style={styles.card}>
-          <Text style={styles.title}>{report.report_title}</Text>
-          <Text style={styles.subTitle}>{report.report_type}</Text>
+        {/* Main Status Header */}
+        <View style={styles.topBanner}>
+          <Icon name="file-document-outline" size={40} color="#fff" />
+          <View style={{ marginLeft: 15 }}>
+            <Text style={styles.topBannerTitle}>{report.report_title}</Text>
+            <Text style={styles.topBannerSubTitle}>{report.report_type}</Text>
+          </View>
         </View>
 
-        {/* Patient Info */}
+        {/* Patient Details Card */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Patient Details</Text>
-          <Text style={styles.value}>
-            Name: {report.patient?.name || 'N/A'}
+          <View style={styles.cardHeader}>
+            <Icon name="account-outline" size={22} color="#ff5722" />
+            <Text style={styles.sectionTitle}>Patient Information</Text>
+          </View>
+          <View style={styles.divider} />
+
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Name</Text>
+              <Text style={styles.value}>{report.patient?.name || 'N/A'}</Text>
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Patient ID</Text>
+              <Text style={styles.value}>{report.patient?.id ? 'PID' + String(report.patient.id).padStart(6, '0') : 'N/A'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Gender</Text>
+              <Text style={styles.value}>{report.patient?.gender || 'N/A'}</Text>
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.value}>{report.patient?.phone || 'N/A'}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Consult Details Card */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Icon name="stethoscope" size={22} color="#ff5722" />
+            <Text style={styles.sectionTitle}>Consultation Details</Text>
+          </View>
+          <View style={styles.divider} />
+
+          <View style={styles.row}>
+            <View style={styles.fullCol}>
+              <Text style={styles.label}>Consulting Doctor</Text>
+              <Text style={[styles.value, { color: '#000', fontSize: 16, fontFamily: 'Poppins-Medium' }]}>
+                {report.doctor?.name ? 'Dr. ' + report.doctor.name : 'Hospital Staff'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Notes Card */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Icon name="text-box-outline" size={22} color="#ff5722" />
+            <Text style={styles.sectionTitle}>Clinical Notes / Remarks</Text>
+          </View>
+          <View style={styles.divider} />
+
+          <Text style={[styles.value, { lineHeight: 22, color: '#444' }]}>
+            {report.notes || 'No remarks provided by the doctor for this report.'}
           </Text>
-          <Text style={styles.value}>
-            Gender: {report.patient?.gender || 'N/A'}
-          </Text>
-          <Text style={styles.value}>
-            Phone: {report.patient?.phone || 'N/A'}
-          </Text>
-        </View>
-
-        {/* Doctor */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Doctor</Text>
-          <Text style={styles.value}>{report.doctor?.name || 'N/A'}</Text>
-        </View>
-
-        {/* Diagnosis */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Diagnosis</Text>
-          <Text style={styles.value}>{report.diagnosis || 'N/A'}</Text>
-        </View>
-
-        {/* Treatment */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Treatment Plan</Text>
-          <Text style={styles.value}>{report.treatment_plan || 'N/A'}</Text>
         </View>
 
         {/* Download Button */}
@@ -375,39 +450,77 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 30,
   },
+  topBanner: {
+    backgroundColor: '#ff5722',
+    borderRadius: 12,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#ff5722',
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  topBannerTitle: {
+    fontSize: 22,
+    color: '#fff',
+    fontFamily: 'Poppins-Bold',
+  },
+  topBannerSubTitle: {
+    fontSize: 14,
+    color: '#ffe0d4',
+    fontFamily: 'Poppins-Medium',
+  },
   card: {
-    backgroundColor: '#f9f9f9',
-    marginBottom: 12,
+    backgroundColor: '#fff',
+    marginBottom: 16,
     padding: 16,
     borderRadius: 12,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
-  title: {
-    fontSize: 20,
-    color: '#000',
-    fontFamily: 'Poppins-SemiBold',
-  },
-  subTitle: {
-    fontSize: 14,
-    color: '#ff5722',
-    marginTop: 6,
-    fontFamily: 'Poppins-SemiBold',
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 16,
-    marginBottom: 8,
     color: '#000',
     fontFamily: 'Poppins-SemiBold',
+    marginLeft: 8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  col: {
+    width: '48%',
+  },
+  fullCol: {
+    width: '100%',
+  },
+  label: {
+    fontSize: 12,
+    color: '#888',
+    fontFamily: 'Poppins-Regular',
+    marginBottom: 2,
   },
   value: {
     fontSize: 14,
-    color: '#555',
-    marginTop: 4,
-    lineHeight: 20,
-    fontFamily: 'Poppins-Regular',
+    color: '#222',
+    fontFamily: 'Poppins-SemiBold',
   },
   buttonContainer: {
-    marginTop: 24,
+    marginTop: 10,
     marginBottom: 16,
   },
   downloadButton: {

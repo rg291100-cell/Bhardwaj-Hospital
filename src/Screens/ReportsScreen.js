@@ -17,63 +17,64 @@ import { baseURL } from '../utils/api';
 // 🔹 Single Report Item
 const ReportItem = ({ item, onPress }) => {
   return (
-    <TouchableOpacity style={styles.reportRow} onPress={onPress}>
-      <View style={styles.iconBox}>
-        <Icon name="file-document" size={24} color="#fff" />
+    <TouchableOpacity style={styles.cardItem} onPress={onPress}>
+      <View style={styles.cardHeader}>
+        <View style={styles.iconBox}>
+          <Icon name="file-document-outline" size={26} color="#fff" />
+        </View>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.cardTitle}>{item.report_title}</Text>
+          <Text style={styles.cardSubtitle}>
+            {item.report_type} | {item.record_date}
+          </Text>
+        </View>
+        <View style={styles.arrowBox}>
+          <Icon name="chevron-right" size={22} color="#ff5722" />
+        </View>
       </View>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.reportTitle}>{item.report_title}</Text>
-        <Text style={styles.reportSubtitle}>
-          {item.report_type} • {item.record_date}
+      <View style={styles.divider} />
+      <View style={{ paddingHorizontal: 4 }}>
+        <Text style={styles.doctorName}>
+          <Icon name="stethoscope" size={14} color="#666" />  {item.doctor?.name ? `Dr. ${item.doctor.name}`.toUpperCase() : 'HOSPITAL STAFF'}
         </Text>
-        <Text style={styles.patientName}>Patient: {item.patient?.name}</Text>
       </View>
-      <Icon name="chevron-right" size={20} color="#999" />
     </TouchableOpacity>
   );
 };
 
-// 🔹 Single Prescription Item (Placeholder for now)
+// 🔹 Single Prescription Item
 const PrescriptionItem = ({ item, onPress }) => {
+  const parsedMedicines = typeof item.medicines === 'string' ? JSON.parse(item.medicines) : item.medicines;
+
   return (
-    <TouchableOpacity style={styles.reportRow} onPress={onPress}>
-      <View style={[styles.iconBox, { backgroundColor: '#4CAF50' }]}>
-        <Icon name="pill" size={24} color="#fff" />
+    <TouchableOpacity style={styles.cardItem} onPress={onPress}>
+      <View style={styles.cardHeader}>
+        <View style={[styles.iconBox, { backgroundColor: '#ff5722' }]}>
+          <Icon name="pill" size={26} color="#fff" />
+        </View>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.cardTitle}>Prescription #{item.id}</Text>
+          <Text style={styles.cardSubtitle}>
+            {item.prescription_date?.split('T')[0]}
+          </Text>
+        </View>
+        <View style={styles.arrowBox}>
+          <Icon name="chevron-right" size={22} color="#ff5722" />
+        </View>
       </View>
 
-      <View style={{ flex: 1, marginRight: 8 }}>
-        <Text style={styles.reportTitle}>Prescription #{item.id}</Text>
-        <Text style={styles.reportSubtitle}>
-          Date: {item.prescription_date?.split('T')[0]}
+      <View style={styles.divider} />
+
+      <View style={{ paddingHorizontal: 4 }}>
+        <Text style={[styles.doctorName, { marginBottom: 0 }]}>
+          <Icon name="stethoscope" size={14} color="#666" />  {item.doctor?.name ? `Dr. ${item.doctor.name}`.toUpperCase() : 'DOCTOR: N/A'}
         </Text>
-        <Text style={styles.patientName}>
-          Doctor: {item.doctor?.name || 'N/A'}
-        </Text>
-
-        {/* Medicines */}
-        {item.medicines?.map((med, index) => (
-          <View key={index} style={{ marginTop: 6 }}>
-            <Text style={styles.medicineText}>
-              {med.medicine} - {med.dosage} - {med.frequency} ({med.duration})
-            </Text>
-          </View>
-        ))}
-
-        {/* Instructions */}
-        {item.instructions && (
-          <Text style={[styles.medicineText, { marginTop: 4 }]}>
-            Instructions: {item.instructions}
-          </Text>
-        )}
-
-        {item.follow_up_advice && (
-          <Text style={[styles.medicineText, { marginTop: 2 }]}>
-            Follow-up: {item.follow_up_advice}
+        {parsedMedicines?.length > 0 && (
+          <Text style={{ fontSize: 13, color: '#ff5722', fontFamily: 'Poppins-Medium', marginTop: 4 }}>
+            Contains {parsedMedicines.length} Medicines
           </Text>
         )}
       </View>
-
-      <Icon name="chevron-right" size={20} color="#999" />
     </TouchableOpacity>
   );
 };
@@ -182,6 +183,7 @@ const ReportsScreen = ({ navigation, route }) => {
         <TouchableOpacity
           style={[styles.tab, activeTab === 'reports' && styles.activeTab]}
           onPress={() => setActiveTab('reports')}>
+          <Icon name="file-chart-outline" size={18} color={activeTab === 'reports' ? '#fff' : '#666'} style={{ marginRight: 6 }} />
           <Text
             style={[
               styles.tabText,
@@ -196,6 +198,7 @@ const ReportsScreen = ({ navigation, route }) => {
             activeTab === 'prescriptions' && styles.activeTab,
           ]}
           onPress={() => setActiveTab('prescriptions')}>
+          <Icon name="pill" size={18} color={activeTab === 'prescriptions' ? '#fff' : '#666'} style={{ marginRight: 6 }} />
           <Text
             style={[
               styles.tabText,
@@ -207,14 +210,22 @@ const ReportsScreen = ({ navigation, route }) => {
       </View>
 
       {/* SEARCH */}
-      <View style={styles.searchBox}>
-        <Icon name="magnify" size={20} color="#999" />
-        <TextInput
-          placeholder={`Search ${activeTab}...`}
-          style={{ flex: 1, marginLeft: 8, fontFamily: 'Poppins-Regular' }}
-          value={search}
-          onChangeText={setSearch}
-        />
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchBox}>
+          <Icon name="magnify" size={22} color="#ff5722" />
+          <TextInput
+            placeholder={`Search ${activeTab}...`}
+            placeholderTextColor="#999"
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <Icon name="close-circle" size={18} color="#ccc" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* CONTENT - Reports or Prescriptions */}
@@ -246,8 +257,7 @@ const ReportsScreen = ({ navigation, route }) => {
             <PrescriptionItem
               item={item}
               onPress={() => {
-                // Navigate to prescription detail when ready
-                console.log('Prescription clicked:', item);
+                navigation.navigate('PrescriptionView', { prescription: item });
               }}
             />
           )}
@@ -300,88 +310,174 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     marginHorizontal: 20,
-    marginTop: 10,
-    backgroundColor: '#f1f4f6',
-    borderRadius: 12,
-    padding: 4,
+    marginTop: 15,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 6,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
   },
   tab: {
     flex: 1,
-    paddingVertical: 10,
+    flexDirection: 'row',
+    paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 10,
+    justifyContent: 'center',
+    borderRadius: 12,
   },
   activeTab: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#ff5722',
   },
   tabText: {
     fontSize: 14,
-    color: '#777',
-    fontFamily: 'Poppins-Medium',
+    color: '#666',
+    fontFamily: 'Poppins-SemiBold',
   },
   activeTabText: {
-    color: '#111',
-    fontWeight: '600',
+    color: '#fff',
   },
 
   /* SEARCH */
+  searchWrapper: {
+    paddingHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 10,
+  },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f4f6',
-    padding: 12,
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
     borderRadius: 12,
-    marginHorizontal: 20,
-    marginTop: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  searchInput: {
+    flex: 1,
+    height: 45,
+    marginLeft: 10,
+    fontFamily: 'Poppins-Regular',
+    color: '#333',
+    fontSize: 14,
   },
 
-  /* REPORT & PRESCRIPTION ROW */
-  reportRow: {
+  /* CARD STYLES (PREMIUM) */
+  cardItem: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 14,
-    borderBottomWidth: 0.5,
-    borderColor: '#eee',
+    alignItems: 'center',
   },
   iconBox: {
-    width: 45,
-    height: 45,
-    borderRadius: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
     backgroundColor: '#ff5722',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
-  reportTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Poppins-Medium',
+  cardTitle: {
+    fontSize: 17,
+    fontFamily: 'Poppins-SemiBold',
     color: '#111',
   },
-  reportSubtitle: {
+  cardSubtitle: {
     fontSize: 13,
-    color: '#777',
-    marginTop: 2,
+    color: '#888',
     fontFamily: 'Poppins-Regular',
+    marginTop: 2,
+  },
+  arrowBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#fff0eb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 12,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   patientName: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: '#555',
+    marginLeft: 6,
+    fontFamily: 'Poppins-Medium',
+  },
+  doctorName: {
+    fontSize: 13,
+    color: '#666',
+    fontFamily: 'Poppins-Medium',
+    letterSpacing: 0.5,
+    marginBottom: 8,
   },
 
   /* MEDICINES & INSTRUCTIONS */
+  medicinesContainer: {
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  medicineItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  bulletPoint: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#ff5722',
+    marginTop: 7,
+    marginRight: 8,
+  },
   medicineText: {
-    fontSize: 13,
-    color: '#555',
+    fontSize: 14,
+    color: '#444',
     fontFamily: 'Poppins-Regular',
-    marginTop: 2,
+    flex: 1,
+  },
+  notesBox: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#ff5722',
+    marginTop: 4,
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#444',
+    fontFamily: 'Poppins-Regular',
+    lineHeight: 18,
+  },
+  infoLabel: {
+    fontFamily: 'Poppins-SemiBold',
+    color: '#222',
   },
 
   /* EMPTY STATES */

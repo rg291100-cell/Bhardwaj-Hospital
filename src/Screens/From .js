@@ -52,16 +52,32 @@ const Form = () => {
 
   const handleRegister = async () => {
     // Validate required fields
-    if (
-      !form.fullName ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.gender ||
-      !form.age ||
-      !form.address
-    ) {
-      Alert.alert('Missing Information', 'Please fill all required fields.');
+    if (!form.fullName) {
+      Alert.alert('Missing Information', 'Full Name is required.');
+      return;
+    }
+    if (!form.email) {
+      Alert.alert('Missing Information', 'Email is required.');
+      return;
+    }
+    if (!form.phone) {
+      Alert.alert('Missing Information', 'Phone Number is required.');
+      return;
+    }
+    if (!form.password) {
+      Alert.alert('Missing Information', 'Password is required.');
+      return;
+    }
+    if (!form.gender) {
+      Alert.alert('Missing Information', 'Gender is required.');
+      return;
+    }
+    if (!form.age) {
+      Alert.alert('Missing Information', 'Age is required.');
+      return;
+    }
+    if (!form.address) {
+      Alert.alert('Missing Information', 'Address is required.');
       return;
     }
 
@@ -174,15 +190,15 @@ const Form = () => {
         const errorData = error?.response?.data;
 
         if (errorData?.errors) {
-          const errorMessages = Object.entries(errorData.errors)
-            .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          const errorMessages = Object.values(errorData.errors)
+            .flat()
             .join('\n');
-          Alert.alert('Validation Error', errorMessages);
+          Alert.alert('Registration Failed', errorMessages);
         } else if (errorData?.message) {
-          Alert.alert('Validation Error', errorData.message);
+          Alert.alert('Registration Failed', errorData.message);
         } else {
           Alert.alert(
-            'Validation Error',
+            'Registration Failed',
             'Please check all fields.\n' + JSON.stringify(errorData),
           );
         }
@@ -234,7 +250,9 @@ const Form = () => {
         </View>
 
         {/* Full Name */}
-        <Text style={styles.label}>Full Name</Text>
+        <Text style={styles.label}>
+          Full Name <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
           placeholder="Enter full name"
@@ -243,7 +261,9 @@ const Form = () => {
         />
 
         {/* Email */}
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>
+          Email <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
           placeholder="Enter email"
@@ -254,7 +274,9 @@ const Form = () => {
         />
 
         {/* Phone Number */}
-        <Text style={styles.label}>Phone Number</Text>
+        <Text style={styles.label}>
+          Phone Number <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
           placeholder="Enter phone number"
@@ -265,7 +287,9 @@ const Form = () => {
         />
 
         {/* Gender */}
-        <Text style={styles.label}>Gender</Text>
+        <Text style={styles.label}>
+          Gender <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={form.gender}
@@ -279,7 +303,9 @@ const Form = () => {
         </View>
 
         {/* Age */}
-        <Text style={styles.label}>Age</Text>
+        <Text style={styles.label}>
+          Age <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
           placeholder="Enter age"
@@ -290,7 +316,9 @@ const Form = () => {
         />
 
         {/* Address */}
-        <Text style={styles.label}>Address</Text>
+        <Text style={styles.label}>
+          Address <Text style={{ color: 'red' }}>*</Text>
+        </Text>
         <TextInput
           style={[styles.input, { height: 90 }]}
           placeholder="Enter address"

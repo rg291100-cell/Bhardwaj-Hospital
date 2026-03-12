@@ -26,12 +26,13 @@ import EmergencyStatus from '../Screens/EmergencyStatus';
 import ReportsScreen from '../Screens/ReportsScreen';
 import MedicalHistory from '../Screens/MedicalHistory';
 import ReportView from '../Screens/ReportView';
+import PrescriptionView from '../Screens/PrescriptionView';
 import Splash from '../Screens/Splash';
 import Otp from '../Screens/Otp';
 import Chat from '../Screens/Chat';
 import Evants from '../Screens/Evants';
 import Services from '../Screens/Services';
-import UpdateProfile from'../Screens/UpdateProfile';
+import UpdateProfile from '../Screens/UpdateProfile';
 import TabNavigation from '../navigation/TabNavigation';
 import Doctor from "../Screens/Doctor"
 import VideoCall from "../Component/VideoCall"
@@ -40,12 +41,12 @@ import PDFViewer from '../Component/PDFViewer';
 
 const Stack = createNativeStackNavigator();
 
- const RootNavigation =()=> {
+const RootNavigation = () => {
   return (
-  
+
     <NavigationContainer>
       <Stack.Navigator>
-         {/* <Stack.Screen
+        {/* <Stack.Screen
           name="Login"
           component={}
           options={{ headerShown: false }}
@@ -60,45 +61,45 @@ const Stack = createNativeStackNavigator();
           component={Login}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="From"
           component={From}
           options={{ headerShown: false }}
         />
-        <Stack.Screen 
-  name="VideoCall" 
-  component={VideoCall}
-  options={{ headerShown: false }}
-/>
-         <Stack.Screen
+        <Stack.Screen
+          name="VideoCall"
+          component={VideoCall}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="TabNavigation"
           component={TabNavigation}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="DoctorDetails"
           component={DoctorDetails}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="Doctor"
           component={Doctor}
           options={{ headerShown: false }}
         />
 
-    <Stack.Screen
+        <Stack.Screen
           name="PDFViewer"
           component={PDFViewer}
           options={{ headerShown: false }}
         />
 
-        
-      <Stack.Screen
+
+        <Stack.Screen
           name="Specialty"
           component={Specialty}
           options={{ headerShown: false }}
         />
-        
+
         <Stack.Screen
           name="BookAppointment"
           component={BookAppointment}
@@ -109,18 +110,18 @@ const Stack = createNativeStackNavigator();
           component={Notifications}
           options={{ headerShown: false }}
         />
-        
+
         <Stack.Screen
           name="Appointment"
           component={Appointment}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="EventsDetail"
           component={EventsDetail}
           options={{ headerShown: false }}
         />
-           <Stack.Screen
+        <Stack.Screen
           name="Chat"
           component={Chat}
           options={{ headerShown: false }}
@@ -130,28 +131,28 @@ const Stack = createNativeStackNavigator();
           component={BookBed}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="AvailableBeds"
           component={AvailableBeds}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="AppointmentDetails"
           component={AppointmentDetails}
           options={{ headerShown: false }}
         />
-        
-             <Stack.Screen
+
+        <Stack.Screen
           name="RescheduleAppointment"
           component={RescheduleAppointment}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="OPD"
           component={OPD}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="BedBookingStatus"
           component={BedBookingStatus}
           options={{ headerShown: false }}
@@ -171,42 +172,42 @@ const Stack = createNativeStackNavigator();
           component={Consultations}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="Prescriptions"
           component={Prescriptions}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="MessageDoctor"
           component={MessageDoctor}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="MedicalNotes"
           component={MedicalNotes}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="Emergency"
           component={Emergency}
           options={{ headerShown: false }}
         />
-          <Stack.Screen
+        <Stack.Screen
           name="Evants"
           component={Evants}
           options={{ headerShown: false }}
         />
-          <Stack.Screen
+        <Stack.Screen
           name="Services"
           component={Services}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="EmergencyStatus"
           component={EmergencyStatus}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="ReportsScreen"
           component={ReportsScreen}
           options={{ headerShown: false }}
@@ -216,22 +217,27 @@ const Stack = createNativeStackNavigator();
           component={MedicalHistory}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="ReportView"
           component={ReportView}
           options={{ headerShown: false }}
         />
-         <Stack.Screen
+        <Stack.Screen
+          name="PrescriptionView"
+          component={PrescriptionView}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="Otp"
           component={Otp}
           options={{ headerShown: false }}
         />
-          <Stack.Screen
+        <Stack.Screen
           name="UpdateProfile"
           component={UpdateProfile}
           options={{ headerShown: false }}
         />
-      
+
       </Stack.Navigator>
     </NavigationContainer>
   );

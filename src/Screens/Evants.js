@@ -57,50 +57,48 @@ const Events = () => {
 
   const renderEvent = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.card} activeOpacity={0.8}
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
         onPress={() => navigation.navigate('EventsDetail', { eventId: item.id })}
-
       >
-        {/* Event Image */}
         <Image
           source={{ uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/events/${item.image}` }}
           style={styles.eventImage}
         />
 
-        <View style={{ flex: 1 }}>
-          {/* Title */}
-          <Text style={styles.eventTitle}>{item.title}</Text>
+        <View style={styles.cardBody}>
+          <View style={styles.typeBadge}>
+            <Text style={styles.typeText}>
+              {item.type.replace('_', ' ').toUpperCase()}
+            </Text>
+          </View>
 
-          {/* Type */}
-          <Text style={styles.eventType}>
-            {item.type.replace('_', ' ').toUpperCase()}
-          </Text>
+          <Text style={styles.eventTitle} numberOfLines={1}>{item.title}</Text>
 
-          {/* Description */}
           <Text style={styles.eventDesc} numberOfLines={2}>
             {item.description}
           </Text>
 
-          {/* Date */}
-          <View style={styles.row}>
-            <Icon name="calendar" size={14} color="#666" />
-            <Text style={styles.metaText}>
-              {new Date(item.event_date).toDateString()}
-            </Text>
-          </View>
+          <View style={styles.metaContainer}>
+            <View style={styles.metaItem}>
+              <Icon name="calendar" size={13} color="#ff5722" />
+              <Text style={styles.metaText}>
+                {new Date(item.event_date).toDateString()}
+              </Text>
+            </View>
 
-          {/* Time */}
-          <View style={styles.row}>
-            <Icon name="clock-outline" size={14} color="#666" />
-            <Text style={styles.metaText}>
-              {item.start_time} - {item.end_time}
-            </Text>
-          </View>
+            <View style={styles.metaItem}>
+              <Icon name="clock-outline" size={13} color="#ff5722" />
+              <Text style={styles.metaText}>
+                {item.start_time} - {item.end_time}
+              </Text>
+            </View>
 
-          {/* Venue */}
-          <View style={styles.row}>
-            <Icon name="map-marker" size={14} color="#666" />
-            <Text style={styles.metaText}>{item.venue}</Text>
+            <View style={styles.metaItem}>
+              <Icon name="map-marker" size={13} color="#ff5722" />
+              <Text style={styles.metaText}>{item.venue}</Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -109,28 +107,45 @@ const Events = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={24} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Icon name="arrow-left" size={26} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Events</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 40 }} />
       </View>
 
-      {/* Loader */}
       {loading ? (
-        <ActivityIndicator size="large" color="#ff5722" style={{ marginTop: 40 }} />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#ff5722" />
+        </View>
       ) : (
         <FlatList
           data={events}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderEvent}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 20 }}
+          ListHeaderComponent={
+            <View style={styles.banner}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.bannerTitle}>Upcoming Events</Text>
+                <Text style={styles.bannerSub}>Don't miss out on hospital events and health camps.</Text>
+              </View>
+              <View style={styles.bannerIcon}>
+                <Icon name="calendar-star" size={36} color="#fff" />
+              </View>
+            </View>
+          }
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No events available</Text>
+            <View style={styles.emptyContainer}>
+              <Icon name="calendar-blank" size={70} color="#ddd" />
+              <Text style={styles.emptyText}>No events available</Text>
+              <Text style={styles.emptySub}>Check back later for new events and camps.</Text>
+            </View>
           }
         />
       )}
@@ -143,83 +158,145 @@ export default Events;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fcfcfc',
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    marginRight: 24,
-    fontFamily: 'Poppins-SemiBold'
-  },
-
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#f9f9f9',
-    padding: 12,
-    borderRadius: 14,
-    marginBottom: 14,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    height: 60,
+    backgroundColor: '#fff',
     elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
   },
-
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: '#000',
+    fontFamily: 'Poppins-SemiBold',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  banner: {
+    backgroundColor: '#ff5722',
+    borderRadius: 20,
+    padding: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    elevation: 6,
+    shadowColor: '#ff5722',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  bannerTitle: {
+    color: '#fff',
+    fontSize: 17,
+    fontFamily: 'Poppins-Bold',
+  },
+  bannerSub: {
+    color: '#ffe4db',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    marginTop: 4,
+    paddingRight: 20,
+  },
+  bannerIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
   eventImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 12,
-    marginRight: 12,
+    width: '100%',
+    height: 160,
     backgroundColor: '#eee',
   },
-
-  eventTitle: {
-    fontSize: 16,
-    color: '#000',
-    fontFamily: 'Poppins-Medium'
+  cardBody: {
+    padding: 16,
   },
-
-  eventType: {
-    fontSize: 12,
+  typeBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff4f0',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  typeText: {
+    fontSize: 10,
     color: '#ff5722',
-    marginTop: 2,
-    fontWeight: '600',
-    fontFamily: 'Poppins-Regular'
-
+    fontFamily: 'Poppins-Bold',
   },
-
+  eventTitle: {
+    fontSize: 17,
+    color: '#111',
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 4,
+  },
   eventDesc: {
     fontSize: 13,
     color: '#666',
-    marginTop: 4,
-    fontFamily: 'Poppins-Regular'
-
+    fontFamily: 'Poppins-Regular',
+    lineHeight: 18,
+    marginBottom: 10,
   },
-
-  row: {
+  metaContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#f5f5f5',
+    paddingTop: 10,
+  },
+  metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 5,
   },
-
   metaText: {
     fontSize: 12,
-    color: '#666',
+    color: '#555',
     marginLeft: 6,
-    fontFamily: 'Poppins-Regular'
-
+    fontFamily: 'Poppins-Regular',
   },
-
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 60,
+  },
   emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
+    fontSize: 18,
+    color: '#333',
+    marginTop: 15,
+    fontFamily: 'Poppins-SemiBold',
+  },
+  emptySub: {
+    fontSize: 13,
     color: '#999',
-    fontFamily: 'Poppins-Regular'
-
+    marginTop: 5,
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
   },
 });

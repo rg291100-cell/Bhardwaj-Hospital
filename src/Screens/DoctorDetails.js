@@ -22,8 +22,13 @@ const DoctorDetails = () => {
   const { doctorId } = route.params;
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-  const [selectedDay, setSelectedDay] = useState(null);
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const getCurrentDay = () => {
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return dayNames[new Date().getDay()];
+  };
+  const [selectedDay, setSelectedDay] = useState(getCurrentDay());
   const [consultationFee, setConsultationFee] = useState(null);
 
   const getDoctorById = async () => {
@@ -132,7 +137,7 @@ const DoctorDetails = () => {
                 <Text
                   style={[
                     styles.dayText,
-                    selectedDay === item.working_days && styles.dayTextSelected,
+                    selectedDay === item && styles.dayTextSelected,
                   ]}
                 >
                   {item}
@@ -429,6 +434,5 @@ const styles = StyleSheet.create({
   dayTextSelected: {
     color: '#fff',
     fontFamily: 'Poppins-Regular',
-
   },
 });

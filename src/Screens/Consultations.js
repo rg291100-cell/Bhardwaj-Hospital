@@ -20,7 +20,7 @@ const Consultations = () => {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={26} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Consultations</Text>
@@ -32,76 +32,76 @@ const Consultations = () => {
         <Text style={styles.sectionTitle}>Past Consultations</Text>
 
         {/* Item 1 */}
-       <TouchableOpacity onPress={()=>navigation.navigate('Prescriptions')}>
-         <View style={styles.consultationItem}>
-          <Image
-            source={require('../assets/Images/Doctor.png')}
-            style={styles.doctorImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.date}>October 26, 2023</Text>
-            <Text style={styles.summary}>
-              Summary: Discussed symptoms of fatigue and prescribed blood tests.
-            </Text>
-            <Text style={styles.doctor}>Dr. Emily Carter</Text>
-          </View>
-        </View>
-       </TouchableOpacity>
-        {/* Item 2 */}
-        <TouchableOpacity onPress={()=>navigation.navigate('Prescriptions')} >
+        <TouchableOpacity onPress={() => navigation.navigate('Prescriptions')}>
           <View style={styles.consultationItem}>
-          <Image
-            source={require('../assets/Images/Doctormen.png')}
-            style={styles.doctorImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.date}>September 15, 2023</Text>
-            <Text style={styles.summary}>
-              Summary: Reviewed previous test results and adjusted medication dosage.
-            </Text>
-            <Text style={styles.doctor}>Dr. Michael Chen</Text>
+            <Image
+              source={require('../assets/Images/Doctor.png')}
+              style={styles.doctorImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.date}>October 26, 2023</Text>
+              <Text style={styles.summary}>
+                Summary: Discussed symptoms of fatigue and prescribed blood tests.
+              </Text>
+              <Text style={styles.doctor}>Dr. Emily Carter</Text>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
+        {/* Item 2 */}
+        <TouchableOpacity onPress={() => navigation.navigate('Prescriptions')} >
+          <View style={styles.consultationItem}>
+            <Image
+              source={require('../assets/Images/Doctormen.png')}
+              style={styles.doctorImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.date}>September 15, 2023</Text>
+              <Text style={styles.summary}>
+                Summary: Reviewed previous test results and adjusted medication dosage.
+              </Text>
+              <Text style={styles.doctor}>Dr. Michael Chen</Text>
+            </View>
+          </View>
         </TouchableOpacity>
 
         {/* Item 3 */}
-       <TouchableOpacity onPress={()=>navigation.navigate('Prescriptions')}>
-         <View style={styles.consultationItem}>
-          <Image
-            source={require('../assets/Images/Doctor.png')}
-            style={styles.doctorImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.date}>August 5, 2023</Text>
-            <Text style={styles.summary}>
-              Summary: Initial consultation for back pain, recommended physical therapy.
-            </Text>
-            <Text style={styles.doctor}>Dr. Sarah Jones</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Prescriptions')}>
+          <View style={styles.consultationItem}>
+            <Image
+              source={require('../assets/Images/Doctor.png')}
+              style={styles.doctorImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.date}>August 5, 2023</Text>
+              <Text style={styles.summary}>
+                Summary: Initial consultation for back pain, recommended physical therapy.
+              </Text>
+              <Text style={styles.doctor}>Dr. Sarah Jones</Text>
+            </View>
           </View>
-        </View>
 
-       </TouchableOpacity>
+        </TouchableOpacity>
         {/* -------------------- UPCOMING CONSULTATIONS -------------------- */}
         <Text style={styles.sectionTitle}>Upcoming Consultations</Text>
 
         {/* Item 4 */}
-       <TouchableOpacity 
-       onPress={()=>navigation.navigate('MessageDoctor')}
-       >
-         <View style={styles.consultationItem}>
-          <Image
-            source={require('../assets/Images/Doctormen.png')}
-            style={styles.doctorImage}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.date}>November 10, 2023</Text>
-            <Text style={styles.summary}>
-              Follow-up appointment to discuss test results.
-            </Text>
-            <Text style={styles.doctor}>Dr. David Lee</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('MessageDoctor')}
+        >
+          <View style={styles.consultationItem}>
+            <Image
+              source={require('../assets/Images/Doctormen.png')}
+              style={styles.doctorImage}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.date}>November 10, 2023</Text>
+              <Text style={styles.summary}>
+                Follow-up appointment to discuss test results.
+              </Text>
+              <Text style={styles.doctor}>Dr. David Lee</Text>
+            </View>
           </View>
-        </View>
-       </TouchableOpacity>
+        </TouchableOpacity>
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 15,
-    marginTop:20,
+    marginTop: 20,
   },
 
   headerTitle: {

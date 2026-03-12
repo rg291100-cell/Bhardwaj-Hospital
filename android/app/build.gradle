@@ -82,8 +82,8 @@ android {
         applicationId "com.bhardwaj"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "8.0"
+        versionCode 12
+        versionName "12.0"
          ndk {
     abiFilters "armeabi-v7a", "arm64-v8a"
         }

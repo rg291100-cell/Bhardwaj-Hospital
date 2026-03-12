@@ -294,16 +294,18 @@ const Home = () => {
                     )}
                   </TouchableOpacity>
 
-                  <Image
-                    source={
-                      user?.profile_picture
-                        ? {
-                          uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/profiles/${user.profile_picture}`,
-                        }
-                        : require('../assets/Images/Splash.png')
-                    }
-                    style={styles.profileImage}
-                  />
+                  <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                    <Image
+                      source={
+                        user?.profile_picture
+                          ? {
+                            uri: `https://argosmob.uk/bhardwaj-hospital/storage/app/public/profiles/${user.profile_picture}`,
+                          }
+                          : require('../assets/Images/Splash.png')
+                      }
+                      style={styles.profileImage}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -440,7 +442,7 @@ const Home = () => {
 
               <TouchableOpacity
                 style={styles.updateNowBtn}
-                onPress={() => openUpdateLink(updateInfo?.update_url)}
+                onPress={() => openUpdateLink('https://play.google.com/store/apps/details?id=com.bhardwaj')}
               >
                 <Text style={styles.updateNowBtnText}>Update Now</Text>
                 <Icon name="arrow-right" size={20} color="#fff" />

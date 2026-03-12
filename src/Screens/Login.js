@@ -53,7 +53,7 @@ const Login = () => {
       // if (response.data.status == 'true') {
       //   Alert.alert('Success', `OTP sent to: ${email}`);
 
-      navigation.navigate('Otp', {
+      navigation.replace('Otp', {
         email: email,
       });
       // } else {

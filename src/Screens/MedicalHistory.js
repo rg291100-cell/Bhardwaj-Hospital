@@ -11,15 +11,26 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 
-const HistoryItem = ({ icon, title, date }) => {
+const HistoryItem = ({ icon, title, date, isLast }) => {
   return (
-    <View style={styles.itemRow}>
-      <View style={styles.iconBox}>
-        <Icon name={icon} size={22} color="#fff" />
+    <View style={styles.itemContainer}>
+      <View style={styles.leftCol}>
+        <View style={[styles.iconBox, { backgroundColor: '#fff4f0' }]}>
+          <Icon name={icon} size={24} color="#ff5722" />
+        </View>
+        {!isLast && <View style={styles.line} />}
       </View>
-      <View>
-        <Text style={styles.itemTitle}>{title}</Text>
-        {date && <Text style={styles.itemDate}>{date}</Text>}
+
+      <View style={styles.rightCol}>
+        <View style={styles.historyCard}>
+          <Text style={styles.itemTitle}>{title}</Text>
+          {date && (
+            <View style={styles.dateRow}>
+              <Icon name="calendar-clock" size={14} color="#888" />
+              <Text style={styles.itemDate}>{date}</Text>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -30,46 +41,72 @@ const MedicalHistory = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={24} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Icon name="arrow-left" size={26} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Medical History</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={{ paddingHorizontal: 20 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingTop: 10 }}>
+
+        {/* Intro Illustration area replacement with a banner */}
+        <View style={styles.banner}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bannerTitle}>Your Health Journey</Text>
+            <Text style={styles.bannerSub}>Keep track of your medical milestones and history.</Text>
+          </View>
+          <View style={styles.bannerIconCircle}>
+            <Icon name="chart-timeline-variant" size={36} color="#fff" />
+          </View>
+        </View>
 
         {/* Previous Treatments */}
-        <Text style={styles.sectionTitle}>Previous Treatments</Text>
-        <HistoryItem icon="pill" title="Physical Therapy" date="2022-08-15" />
+        <View style={styles.sectionHeader}>
+          <View style={styles.indicator} />
+          <Text style={styles.sectionTitle}>Previous Treatments</Text>
+        </View>
+        <HistoryItem icon="pill" title="Physical Therapy" date="Aug 15, 2022" />
         <HistoryItem
           icon="pill"
           title="Antibiotics for Sinus Infection"
-          date="2021-03-20"
+          date="Mar 20, 2021"
         />
 
         {/* Chronic Conditions */}
-        <Text style={styles.sectionTitle}>Chronic Conditions</Text>
+        <View style={[styles.sectionHeader, { marginTop: 25 }]}>
+          <View style={styles.indicator} />
+          <Text style={styles.sectionTitle}>Chronic Conditions</Text>
+        </View>
         <HistoryItem icon="heart-pulse" title="Asthma" />
         <HistoryItem icon="heart-pulse" title="High Blood Pressure" />
 
         {/* Surgery History */}
-        <Text style={styles.sectionTitle}>Surgery History</Text>
-        <HistoryItem icon="stethoscope" title="Appendectomy" date="2018-05-10" />
+        <View style={[styles.sectionHeader, { marginTop: 25 }]}>
+          <View style={styles.indicator} />
+          <Text style={styles.sectionTitle}>Surgery History</Text>
+        </View>
+        <HistoryItem icon="stethoscope" title="Appendectomy" date="May 10, 2018" />
 
         {/* Allergy Information */}
-        <Text style={styles.sectionTitle}>Allergy Information</Text>
-        <HistoryItem icon="alert" title="Penicillin" />
-        <HistoryItem icon="alert" title="Peanuts" />
+        <View style={[styles.sectionHeader, { marginTop: 25 }]}>
+          <View style={styles.indicator} />
+          <Text style={styles.sectionTitle}>Allergies</Text>
+        </View>
+        <HistoryItem icon="alert-decagram-outline" title="Penicillin" />
+        <HistoryItem icon="alert-decagram-outline" title="Peanuts" />
 
         {/* Immunization Records */}
-        <Text style={styles.sectionTitle}>Immunization Records</Text>
-        <HistoryItem icon="needle" title="Flu Shot" date="2020-11-15" />
-        <HistoryItem icon="needle" title="Tetanus Booster" date="2019-07-22" />
+        <View style={[styles.sectionHeader, { marginTop: 25 }]}>
+          <View style={styles.indicator} />
+          <Text style={styles.sectionTitle}>Immunizations</Text>
+        </View>
+        <HistoryItem icon="needle" title="Flu Shot" date="Nov 15, 2020" />
+        <HistoryItem icon="needle" title="Tetanus Booster" date="Jul 22, 2019" isLast={true} />
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -82,55 +119,133 @@ export default MedicalHistory;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fcfcfc',
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    marginTop:10,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    height: 60,
+    backgroundColor: '#fff',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
   },
-
+  backButton: {
+    padding: 5,
+  },
   headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-    marginRight: 24,
+    fontSize: 20,
+    color: '#000',
+    fontFamily: 'Poppins-SemiBold',
   },
-
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginTop: 25,
-    marginBottom: 10,
-  },
-
-  itemRow: {
+  banner: {
+    backgroundColor: '#ff5722',
+    borderRadius: 20,
+    padding: 24,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    marginBottom: 25,
+    elevation: 6,
+    shadowColor: '#ff5722',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
   },
-
-  iconBox: {
-    width: 45,
-    height: 45,
-    borderRadius: 10,
-    backgroundColor: '#ff5722',
+  bannerTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+  },
+  bannerSub: {
+    color: '#ffe4db',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    marginTop: 4,
+    paddingRight: 10,
+  },
+  bannerIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
-
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  indicator: {
+    width: 4,
+    height: 18,
+    backgroundColor: '#ff5722',
+    borderRadius: 2,
+    marginRight: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    color: '#111',
+    fontFamily: 'Poppins-SemiBold',
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    minHeight: 80,
+  },
+  leftCol: {
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  iconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  line: {
+    width: 2,
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 4,
+  },
+  rightCol: {
+    flex: 1,
+    paddingBottom: 20,
+  },
+  historyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 15,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#f5f5f5',
+  },
   itemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    color: '#222',
+    fontFamily: 'Poppins-SemiBold',
   },
-
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
   itemDate: {
-    fontSize: 13,
-    color: '#777',
-    marginTop: 3,
+    fontSize: 12,
+    color: '#888',
+    fontFamily: 'Poppins-Regular',
+    marginLeft: 6,
   },
 });

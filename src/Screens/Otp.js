@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
@@ -44,6 +45,17 @@ const Otp = () => {
 
     return () => clearInterval(interval);
   }, [timer]);
+
+  // Disable hardware back press to prevent going back to login screen
+  useEffect(() => {
+    const onBackPress = () => {
+      return true;
+    };
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    };
+  }, []);
 
   const formatTime = seconds => {
     const mins = Math.floor(seconds / 60);
@@ -152,14 +164,11 @@ const Otp = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={26} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verify OTP</Text>
+        <Text style={[styles.headerTitle, { marginLeft: 0 }]}>Verify OTP</Text>
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.content}>
         <Icon
           name="email-check-outline"
